@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ConfQL Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .btn-primary {
+        @apply bg-gray-800 hover:bg-gray-900 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200;
+      }
+      .btn-secondary {
+        @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-lg transition-colors duration-200;
+      }
+      .btn-secondary.active {
+        @apply bg-gray-200 text-gray-900 border-2 border-gray-300;
+      }
+      .search-input {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent;
+      }
+      .file-upload {
+        @apply block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 transition-colors duration-200;
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen">
+    <div id="app" class="min-h-screen">
+      <!-- Header -->
+      <header class="border-b border-gray-200 py-6 px-6 bg-white">
+        <div class="flex items-center justify-between">
+          <div class="text-left">
+            <h1 class="text-2xl font-bold text-gray-900">ConfQL Map</h1>
+            <p class="text-gray-600 mt-1">Visualize your YAML and JSON files as an interactive Mind Map</p>
+            <!-- Privacy Notice -->
+            <p class="text-xs text-gray-500 mt-2">
+              🔒 <strong>Privacy First:</strong> Your data is processed locally in your browser and never sent to our servers.
+            </p>
+          </div>
+          <div class="text-right">
+            <a href="index.html" class="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm block mb-2">
+              ← Back to HomePage
+            </a>
+            <!-- Made with Love -->
+            <p class="text-xs text-gray-500">
+              Made with ❤️ from India by <strong>Sarav AK and Team</strong>
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="w-full">
+        <!-- Controls Section -->
+        <div class="border-b border-gray-200 px-6 py-4 bg-gray-50">
+          <div class="grid md:grid-cols-3 gap-6">
+            <!-- File Upload -->
+            <div class="space-y-2">
+              <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">
+                📁 Upload Configuration File
+              </label>
+              <input type="file" id="file-upload" accept=".yml,.yaml,.json" class="file-upload">
+              <p class="text-xs text-gray-500">Supports YAML, YML, and JSON files</p>
+            </div>
+
+            <!-- Search Box -->
+            <div class="space-y-2">
+              <label for="search-input" class="block text-sm font-medium text-gray-700 mb-2">
+                🔍 Search Nodes
+              </label>
+              <div class="flex gap-2">
+                <input type="search" id="search-input" placeholder="Search for nodes..." class="search-input">
+                <button id="search-button" class="btn-primary whitespace-nowrap">Search</button>
+              </div>
+            </div>
+
+            <!-- Layout Controls -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                🎨 Layout Options
+              </label>
+              <div class="flex gap-2">
+                <button id="lr-layout-button" class="btn-secondary active">Horizontal</button>
+                <button id="tb-layout-button" class="btn-secondary">Vertical</button>
+                <button id="radial-layout-button" class="btn-secondary">Radial</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mind Map Container -->
+        <div class="w-full">
+          <div id="mindmap-container" class="w-full min-h-[calc(100vh-200px)] bg-white"></div>
+        </div>
+      </main>
+
+      <!-- Context Menu -->
+      <div id="context-menu" class="context-menu hidden fixed bg-white rounded-lg shadow-xl border border-gray-200 py-2 min-w-[200px] z-50">
+        <ul class="space-y-1">
+          <li>
+            <button id="focus-node-button" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200">
+              🎯 Focus on this node
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

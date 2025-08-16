@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ConfQL – Query Any Config</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+  <!-- Hero -->
+  <section class="relative bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-16 px-6 text-center">
+    <div class="absolute top-4 right-4 flex gap-4">
+      <a href="https://github.com/AKSarav/ConfQL" target="_blank" aria-label="GitHub" class="text-white hover:text-gray-300 transition">
+        <i class="fab fa-github fa-2x"></i>
+      </a>
+      <a href="#" target="_blank" aria-label="Discord" class="text-white hover:text-gray-300 transition">
+        <i class="fab fa-discord fa-2x"></i>
+      </a>
+    </div>
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">ConfQL – A Unified Augmentation Engine for Config Data</h1>
+    <span class="max-w-2xl mx-auto text-lg opacity-90 mb-8 text-white/60">
+        Turn YAML, JSON, and TOML into SQL & AI-ready knowledge.
+    </span>
+    
+    <!-- Flow Diagram -->
+    <div class="max-w-5xl mx-auto py-12">
+      <div class="relative">
+        <!-- Grid for Content -->
+        <div class="grid grid-cols-5 items-center gap-x-4 md:gap-x-8">
+          <!-- Column 1: Input Config Files -->
+          <div class="flex flex-col gap-10 items-end">
+            <div class="flex items-center gap-4 opacity-0 animate-fadeIn" style="animation-delay: 0.2s;">
+              <span class="text-lg font-medium text-white">YAML</span>
+              <img src="/images/file.png" alt="File icon" class="w-16 h-16 object-contain">
+            </div>
+            <div class="flex items-center gap-4 opacity-0 animate-fadeIn" style="animation-delay: 0.4s;">
+              <span class="text-lg font-medium text-white">JSON</span>
+              <img src="/images/file.png" alt="File icon" class="w-16 h-16 object-contain">
+            </div>
+            <div class="flex items-center gap-4 opacity-0 animate-fadeIn" style="animation-delay: 0.6s;">
+              <span class="text-lg font-medium text-white">TOML</span>
+              <img src="/images/file.png" alt="File icon" class="w-16 h-16 object-contain">
+            </div>
+          </div>
+
+          <!-- Column 2: Arrow to ConfQL -->
+          <div class="text-center opacity-0 animate-fadeIn" style="animation-delay: 0.8s;">
+            <svg class="w-12 h-12 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </div>
+
+          <!-- Column 3: ConfQL Engine -->
+          <div class="text-center opacity-0 animate-fadeIn" style="animation-delay: 1s;">
+            <img src="/images/QLsearch.png" alt="ConfQL Engine" class="w-24 h-24 object-contain mx-auto">
+            <span class="text-lg font-semibold text-white mt-2 block">ConfQL</span>
+          </div>
+
+          <!-- Column 4: Arrow to Outcomes -->
+          <div class="text-center opacity-0 animate-fadeIn" style="animation-delay: 1.2s;">
+            <svg class="w-12 h-12 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </div>
+
+          <!-- Column 5: Outcomes -->
+          <div class="flex flex-col gap-10 items-start">
+            <div class="flex items-center gap-4 opacity-0 animate-fadeIn" style="animation-delay: 1.4s;">
+              <img src="/images/sql.png" alt="SQL Icon" class="w-16 h-16 object-contain">
+              <span class="text-lg font-medium text-white">SQL</span>
+            </div>
+            <div class="flex items-center gap-4 opacity-0 animate-fadeIn" style="animation-delay: 1.6s;">
+              <img src="/images/sql-ai.png" alt="AI Icon" class="w-16 h-16 object-contain">
+              <div>
+                <span class="text-lg font-medium text-white">AI NLP</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 opacity-0 animate-fadeIn" style="animation-delay: 1.8s;">
+              <img src="/images/visualization.png" alt="Visualization Icon" class="w-16 h-16 object-contain">
+              <span class="text-lg font-medium text-white">MindMap</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-8 flex justify-center gap-4">
+      <a href="https://github.com/AKSarav/YamlQL" class="px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg shadow hover:bg-gray-200 transition">Try YamlQL</a>
+      <a href="map.html" class="px-6 py-3 bg-transparent border border-white font-semibold rounded-lg hover:bg-white hover:text-purple-600 transition">Try ConfQL-Map</a>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="py-16 px-6 max-w-4xl mx-auto text-center">
+    <h2 class="text-3xl font-bold mb-6">The Problem</h2>
+    <p class="text-lg text-gray-700">
+      Configuration formats like YAML, JSON, and TOML are everywhere — from Kubernetes deployments to Docker Compose files.
+      But querying them is clunky. Existing tools have steep learning curves or can't handle relationships and aggregations.
+    </p>
+  </section>
+
+  <!-- Solution -->
+  <section class="bg-gray-100 py-16 px-6">
+    <div class="max-w-5xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-6">Our Solution</h2>
+      <div class="grid md:grid-cols-3 gap-8 text-left">
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-3">SQL for Config</h3>
+          <p>Query YAML, JSON, and TOML using plain SQL. No new syntax to learn — just the language you already know.</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-3">AI Mode</h3>
+          <p>Don’t know SQL? No problem. Let AI generate the queries for you, without sending your actual data to third parties.</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-3">Visualization</h3>
+          <p>Turn complex config files into interactive mind maps to understand relationships instantly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Open Source First -->
+  <section class="bg-white py-16 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold">❤️ Open Source First</h2>
+        <p class="mt-4 text-lg text-gray-700">ConfQL is built with an open-source-first philosophy.</p>
+      </div>
+      <div class="grid md:grid-cols-1 lg:grid-cols-3 gap-8 text-left">
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition">
+          <p class="text-gray-600">The core engine — YamlQL, TomlQL, JsonQL, and ConfQL itself — is completely free and open source. Developers can query, transform, and integrate configuration data without restrictions.</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-3">🚀 Why a Hosted Layer?</h3>
+          <p class="text-gray-600">While the core stays open, tools like ConfQL-Map (visualizer) and YamlQL-Web (UI with AI SQL) require hosting, compute, and maintenance. To keep the lights on 🌱 and make ConfQL sustainable, these products are offered as hosted services with Generous free tier and Pay as you go pricing.</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-3">🔑 The Open Core Promise</h3>
+          <ul class="space-y-2 text-gray-600">
+            <li>✅ Always Free → Core libraries & CLI</li>
+            <li>✅ Community Friendly → Contributions welcome</li>
+            <li>✅ Transparent → No lock-in, no hidden tricks</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <!-- Data Privacy -->
+    <section class="bg-gray-100 py-16 px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-4">🔒 Data Privacy & Security</h2>
+        <p class="text-lg text-gray-700 mb-8">At ConfQL, we believe responsible AI starts with respecting your data. That’s why we built everything with privacy-first principles:</p>
+        <ul class="space-y-4 text-left mx-auto max-w-2xl">
+          <li class="flex items-start">
+            <span class="text-green-500 mr-3 mt-1">🛠</span>
+            <span><strong class="font-semibold">Open Source at the Core</strong> → All core libraries are open source and can be fully self-hosted. No black boxes, no hidden data flows.</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-500 mr-3 mt-1">💻</span>
+            <span><strong class="font-semibold">Local First</strong> → Visualizers and tools like ConfQL-Map run in your browser or local environment — your data stays with you.</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-500 mr-3 mt-1">🧹</span>
+            <span><strong class="font-semibold">Ephemeral Sessions</strong> → Hosted tools like YamlQL-Web clear all data once your session ends. Nothing is stored, nothing is logged.</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-500 mr-3 mt-1">🙅</span>
+            <span><strong class="font-semibold">No Hidden Agendas</strong> → We don’t have the capacity (or the interest!) to hoard your data. Our mission is to give you clarity, not collect your configs.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+  
+
+  <!-- Available Now -->
+  <section class="py-16 px-6 max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold mb-10 text-center">What’s Available Now</h2>
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-3">YamlQL</h3>
+        <p>Query YAML files with SQL or AI. Handle nested structures, joins, and aggregations with ease.</p>
+        <a href="https://github.com/AKSarav/YamlQL" class="mt-4 inline-block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition">View on GitHub</a>
+      </div>
+      <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition" id="visualizer">
+        <h3 class="text-xl font-semibold mb-3">Visualizer</h3>
+        <p>Convert YAML and JSON into an interactive mind map. Perfect for complex deployments and configs.</p>
+        <a href="#" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Try Visualizer</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section class="bg-gray-100 py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold mb-12 text-center">Our Roadmap</h2>
+      
+      <!-- Horizontal Timeline -->
+      <div class="relative">
+        <!-- Connecting Line -->
+        <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-green-400 via-blue-400 to-purple-400 transform -translate-y-1/2"></div>
+        
+        <!-- Timeline Items -->
+        <div class="relative flex justify-between  items-center">
+          <!-- YamlQL - Completed -->
+          <div class="flex flex-col items-center relative z-10">
+            <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-lg mb-4">
+              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="text-center max-w-32">
+              <h3 class="font-semibold text-green-700 mb-2">YamlQL Library</h3>
+              <p class="text-sm text-gray-600">Query YAML with SQL or AI</p>
+            </div>
+          </div>
+
+          <!-- YamlQL Web - Completed -->
+          <div class="flex flex-col items-center relative z-10">
+            <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-lg mb-4">
+              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="text-center max-w-32">
+              <h3 class="font-semibold text-green-700 mb-2">YamlQL Web</h3>
+              <p class="text-sm text-gray-600">Web interface for YamlQL</p>
+            </div>
+          </div>
+  
+          <!-- ConfQL-Map - Completed -->
+          <div class="flex flex-col items-center relative z-10">
+            <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-lg mb-4">
+              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="text-center max-w-32">
+              <h3 class="font-semibold text-green-700 mb-2">ConfQL-Map</h3>
+              <p class="text-sm text-gray-600">Interactive mind maps</p>
+            </div>
+          </div>
+
+          <!-- ConfQL-JSON - In Progress -->
+          <div class="flex flex-col items-center relative z-10">
+            <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center shadow-lg mb-4 animate-pulse">
+              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="text-center max-w-32">
+              <h3 class="font-semibold text-blue-700 mb-2">ConfQL-JSON</h3>
+              <p class="text-sm text-gray-600">Query JSON with SQL or NLP</p>
+            </div>
+          </div>
+
+          <!-- ConfQL-TOML - In Progress -->
+          <div class="flex flex-col items-center relative z-10">
+            <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center shadow-lg mb-4 animate-pulse">
+              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="text-center max-w-32">
+              <h3 class="font-semibold text-blue-700 mb-2">ConfQL-TOML</h3>
+              <p class="text-sm text-gray-600">Query TOML with SQL or NLP</p>
+            </div>
+          </div>
+
+          <!-- ConfQL-RAG - Future -->
+          <div class="flex flex-col items-center relative z-10">
+            <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center shadow-lg mb-4">
+              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div class="text-center max-w-32">
+              <h3 class="font-semibold text-purple-700 mb-2">ConfQL-RAG</h3>
+              <p class="text-sm text-gray-600">Knowledge base & RAG pipelines</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Indicators -->
+        <div class="mt-8 flex justify-center">
+          <div class="flex items-center space-x-2 text-sm text-gray-600">
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+              <span>Completed</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+              <span>In Progress</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+              <span>Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- CTA -->
+  <section class="py-16 px-6 text-center">
+    <h2 class="text-3xl font-bold mb-4">Join the Journey</h2>
+    <p class="text-lg mb-6">Sign up for updates and be the first to try ConfQL as it grows.</p>
+    <form class="max-w-md mx-auto flex gap-2">
+      <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 rounded border focus:outline-none focus:ring-2 focus:ring-purple-500"/>
+      <button type="submit" class="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition">Notify Me</button>
+    </form>
+  </section>
+
+  <footer class="py-6 text-center text-gray-500 text-sm">
+    © 2025 ConfQL Project. Built by Sarav AK.
+  </footer>
+
+  <!-- CSS Animations -->
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-fadeIn {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+    
+    @keyframes growX {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    
+    /* Glow animation for arrows */
+    @keyframes soft-glow {
+      0%, 100% {
+        filter: drop-shadow(0 0 4px #3B82F6);
+      }
+      50% {
+        filter: drop-shadow(0 0 8px #06B6D4);
+      }
+    }
+    .arrow-glow {
+      animation: soft-glow 2.5s ease-in-out infinite;
+    }
+    .arrow-glow path {
+      animation: pulse-glow 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% {
+        filter: url(#glow-1);
+      }
+      50% {
+        filter: url(#glow-2);
+      }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .flex.justify-between {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      .flex.justify-between .relative {
+        position: static;
+      }
+      
+      .flex.justify-between .absolute.top-1\/2 {
+        display: none;
+      }
+    }
+  </style>
+</body>
+</html>
