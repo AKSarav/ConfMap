@@ -73,6 +73,24 @@ The optimized files will be located in the `dist/` directory.
 *   **Apache ECharts:** A powerful and highly configurable charting and visualization library.
 *   **js-yaml:** A JavaScript YAML parser.
 
+
+### 💎 Feature Tiers & Pricing Strategy
+
+#### Free Tier (Current)
+* Basic YAML → Graph visualization
+* Simple node search
+* Export to PNG/SVG
+* Limit: Max 5 files, 100 nodes
+
+#### 🚀 Premium Tier ($19/month)
+
+* Graph RAG: Semantic search across configs
+* NLP Queries: Natural language questions
+* Advanced Analytics: Dependency analysis, impact assessment
+* Unlimited: Files, nodes, storage
+* API Access: Programmatic queries
+
+
 ## Contributing
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
