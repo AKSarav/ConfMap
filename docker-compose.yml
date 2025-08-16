@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  confql-map:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"  # For future SSL
+    volumes:
+      - ./logs:/var/log/nginx
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - confql-network
+
+  # Optional: Add nginx-proxy for SSL termination later
+  # nginx-proxy:
+  #   image: nginxproxy/nginx-proxy
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock:ro
+  #     - ./certs:/etc/nginx/certs
+  #   restart: unless-stopped
+  #   networks:
+  #     - confql-network
+
+networks:
+  confql-network:
+    driver: bridge
+
+volumes:
+  logs:
