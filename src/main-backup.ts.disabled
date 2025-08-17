@@ -1,4 +1,4 @@
-import './input.css';
+import './style.css';
 import yaml from 'js-yaml';
 import * as echarts from 'echarts';
 
@@ -112,6 +112,8 @@ function renderChart(data: EChartsTreeData) {
         bottom: isRadial ? '15%' : '2%',
         right: isRadial ? '15%' : '20%',
         roam: true,
+
+
         symbol: 'none',
         symbolSize: 1,
         label: {
@@ -121,8 +123,8 @@ function renderChart(data: EChartsTreeData) {
           padding: [8, 15],
           borderRadius: 8,
           backgroundColor: 'inherit',
-          borderColor: 'transparent',
-          borderWidth: 0,
+          borderColor: (params: any) => params.data.label.borderColor,
+          borderWidth: (params: any) => params.data.label.borderWidth,
           formatter: (params: any) => {
             const { name, isParent, collapsed } = params.data;
             if (isParent) {
@@ -196,18 +198,23 @@ fileUpload.addEventListener('change', (event) => {
 
 function handleSearch() {
   if (!originalTreeData) return;
+  const query = searchInput.value.toLowerCase();
+  const searchedData = JSON.parse(JSON.stringify(originalTreeData));
 
-  const searchTerm = searchInput.value.toLowerCase().trim();
-  if (!searchTerm) {
-    renderChart(originalTreeData);
+  if (!query) {
+    function clearHighlights(node: EChartsTreeData) {
+        node.label.borderColor = 'transparent';
+        node.label.borderWidth = 0;
+        if (node.children) node.children.forEach(clearHighlights);
+    }
+    clearHighlights(searchedData);
+    renderChart(searchedData);
     return;
   }
 
-  const searchedData = JSON.parse(JSON.stringify(originalTreeData));
   let found = false;
-
   function traverse(node: EChartsTreeData): boolean {
-    const isMatch = node.name.toLowerCase().includes(searchTerm);
+    let isMatch = node.name.toLowerCase().includes(query);
     node.label.borderColor = 'transparent';
     node.label.borderWidth = 0;
     if (isMatch) {
@@ -253,7 +260,7 @@ function handleFocus() {
 
     function collapseAll(node: EChartsTreeData) {
         if (node.isParent) node.collapsed = true;
-        if (node.children) node.children.forEach(child => collapseAll(child));
+        if (node.children) node.children.forEach(collapseAll);
     }
     collapseAll(originalTreeData);
 
@@ -295,13 +302,12 @@ window.addEventListener('click', () => {
     contextMenu.style.display = 'none';
 });
 
-// Simplified context menu handling
 myChart.on('contextmenu', (params) => {
+    params.event.event.preventDefault();
     if (params.dataType === 'node') {
         focusedNode = params.data as EChartsTreeData;
-        // Simple positioning without complex event handling
-        contextMenu.style.left = '50%';
-        contextMenu.style.top = '50%';
+        contextMenu.style.left = params.event.event.clientX + 'px';
+        contextMenu.style.top = params.event.event.clientY + 'px';
         contextMenu.style.display = 'block';
     }
 });

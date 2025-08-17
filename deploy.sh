@@ -5,7 +5,7 @@
 
 set -e
 
-echo "🚀 Deploying ConfQL-Map to DigitalOcean..."
+echo "🚀 Deploying ConfMap to DigitalOcean..."
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
@@ -32,13 +32,16 @@ sleep 10
 
 # Check if the service is running
 if curl -f http://localhost/health &> /dev/null; then
-    echo "✅ ConfQL-Map is successfully deployed!"
-    echo "🌐 Access your app at: http://localhost"
+    echo "✅ ConfMap is successfully deployed!"
+    echo "🔗 Access it at http://<your-droplet-ip>"
     echo "📊 Health check: http://localhost/health"
 else
-    echo "❌ Service is not responding. Check logs with: docker-compose logs"
+    echo "❌ Service is not responding."
+    echo "   Check the logs with 'docker-compose logs -f'"
     exit 1
 fi
+
+echo "🎉 Deployment finished!"
 
 echo ""
 echo "📋 Useful commands:"

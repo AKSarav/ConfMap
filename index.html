@@ -2,8 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/images/ConfQL-Logo.png" />
+    <link rel="apple-touch-icon" href="/images/ConfQL-Logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>ConfQL – Query Any Config</title>
+    <title>ConfQL | Unified Query Engine for YAML, JSON & TOML</title>
+    <meta name="description" content="ConfQL is a unified query engine that turns YAML, JSON, and TOML into SQL & AI-ready knowledge. Visualize configs with ConfMap, our interactive mind map tool." />
+    <meta name="keywords" content="ConfQL, ConfMap, YAML, JSON, TOML, SQL, AI, configuration, query engine, visualizer, mind map" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://confql.com/" />
+    <meta property="og:title" content="ConfQL | Unified Query Engine for YAML, JSON & TOML" />
+    <meta property="og:description" content="Turn YAML, JSON, and TOML into SQL & AI-ready knowledge. Visualize your configs with our interactive mind map tool, ConfMap." />
+    <meta property="og:image" content="https://confql.com/images/ConfQL-Logo.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://confql.com/" />
+    <meta property="twitter:title" content="ConfQL | Unified Query Engine for YAML, JSON & TOML" />
+    <meta property="twitter:description" content="Turn YAML, JSON, and TOML into SQL & AI-ready knowledge. Visualize your configs with our interactive mind map tool, ConfMap." />
+    <meta property="twitter:image" content="https://confql.com/images/ConfQL-Logo.png" />
+
+    <!-- Schema.org markup for Google+ -->
+    <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "ConfQL",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "description": "A unified query engine that turns YAML, JSON, and TOML into SQL & AI-ready knowledge. Visualize configs with ConfMap, our interactive mind map tool.",
+      "url": "https://confql.com/",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-502YJ12E3P"></script>
@@ -18,23 +54,33 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://cdn.tailwindcss.com"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
   <style>
     body {
       font-family: 'Inter', sans-serif;
     }
   </style>
+  
+  <!-- Import CSS for Tailwind -->
+  <script type="module" src="/src/input.css"></script>
 </head>
 <body class="bg-gray-50 text-gray-900">
 
   <!-- Hero -->
   <section class="relative bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-16 px-6 text-center">
+    <!-- Beta Indicator -->
+    <div class="absolute top-4 left-4">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 backdrop-blur-sm text-white border border-white/20">
+        🚀 Beta Version
+      </span>
+    </div>
+
     <div class="absolute top-4 right-4 flex gap-4">
-      <a href="https://github.com/AKSarav/ConfQL" target="_blank" aria-label="GitHub" class="text-white hover:text-gray-300 transition">
+      <a href="https://github.com/AKSarav/YamlQL" target="_blank" aria-label="GitHub" class="text-white hover:text-gray-300 transition">
         <i class="fab fa-github fa-2x"></i>
       </a>
-      <a href="#" target="_blank" aria-label="Discord" class="text-white hover:text-gray-300 transition">
+      <a href="https://discord.gg/BDJeKUvbr5" target="_blank" aria-label="Discord" class="text-white hover:text-gray-300 transition">
         <i class="fab fa-discord fa-2x"></i>
       </a>
     </div>
@@ -98,7 +144,7 @@
             </div>
             <div class="flex items-center gap-4 opacity-0 animate-fadeIn" style="animation-delay: 1.8s;">
               <img src="/images/visualization.png" alt="Visualization Icon" class="w-16 h-16 object-contain">
-              <span class="text-lg font-medium text-white">MindMap</span>
+              <span class="text-lg font-medium text-white">ConfMap</span>
             </div>
           </div>
         </div>
@@ -106,8 +152,8 @@
     </div>
     
     <div class="mt-8 flex justify-center gap-4">
-      <a href="https://github.com/AKSarav/YamlQL" class="px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg shadow hover:bg-gray-200 transition">Try YamlQL</a>
-      <a href="map.html" class="px-6 py-3 bg-transparent border border-white font-semibold rounded-lg hover:bg-white hover:text-purple-600 transition">Try ConfQL-Map</a>
+      <a href="https://staging-app.yamlql.com/" class="px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg shadow hover:bg-gray-200 transition">Try YamlQL Web</a>
+      <a href="map.html" class="px-6 py-3 bg-transparent border border-white font-semibold rounded-lg hover:bg-white hover:text-purple-600 transition">Try ConfMap</a>
     </div>
   </section>
 
@@ -258,7 +304,7 @@
               </svg>
             </div>
             <div class="text-center max-w-32">
-              <h3 class="font-semibold text-green-700 mb-2">ConfQL-Map</h3>
+              <h3 class="font-semibold text-green-700 mb-2">ConfMap</h3>
               <p class="text-sm text-gray-600">Interactive mind maps</p>
             </div>
           </div>
@@ -329,14 +375,37 @@
   <section class="py-16 px-6 text-center">
     <h2 class="text-3xl font-bold mb-4">Join the Journey</h2>
     <p class="text-lg mb-6">Sign up for updates and be the first to try ConfQL as it grows.</p>
-    <form class="max-w-md mx-auto flex gap-2">
-      <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 rounded border focus:outline-none focus:ring-2 focus:ring-purple-500"/>
-      <button type="submit" class="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition">Notify Me</button>
+    <form
+      action="https://buttondown.com/api/emails/embed-subscribe/confql"
+      method="post"
+      target="popupwindow"
+      onsubmit="window.open('https://buttondown.com/confql', 'popupwindow')"
+      class="embeddable-buttondown-form max-w-md mx-auto"
+    >
+      <div class="flex gap-2 mb-3">
+        <input 
+          type="email" 
+          name="email" 
+          id="bd-email" 
+          placeholder="Enter your email" 
+          class="flex-1 px-4 py-3 rounded border focus:outline-none focus:ring-2 focus:ring-purple-500"
+          required
+        />
+        <button 
+          type="submit" 
+          class="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+        >
+          Subscribe
+        </button>
+      </div>
+      <p class="text-xs text-gray-500">
+        <a href="https://buttondown.com/refer/confql" target="_blank" class="text-gray-400 hover:text-gray-600">Powered by Buttondown</a>
+      </p>
     </form>
   </section>
 
   <footer class="py-6 text-center text-gray-500 text-sm">
-    © 2025 ConfQL Project. Built by Sarav AK.
+    © 2025 ConfQL Project
   </footer>
 
   <!-- CSS Animations -->

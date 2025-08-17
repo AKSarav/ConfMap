@@ -1,212 +1,77 @@
-# 🚀 ConfQL-Map Deployment Guide
+# Deployment Guide for ConfMap
 
-## 📋 Quick Start Options
-
-### **Option 1: Netlify (Recommended for now)**
-**Best for:** Quick deployment, free hosting, static sites
-**Time:** 5 minutes
-**Cost:** Free tier available
-
-### **Option 2: DigitalOcean (Future-ready)**
-**Best for:** Full control, custom domain, future backend features
-**Time:** 15 minutes
-**Cost:** $5-10/month
+This guide provides instructions for deploying the ConfMap application to two popular platforms: Netlify (for simple static hosting) and DigitalOcean (using Docker for more control).
 
 ---
 
-## 🚀 Option 1: Deploy to Netlify
+## Option 1: Deploying to Netlify
 
-### **Step 1: Push to GitHub**
-```bash
-git add .
-git commit -m "Add deployment files"
-git push origin main
-```
+Netlify is the easiest way to deploy a frontend application. It's perfect for static sites and handles the build process for you.
 
-### **Step 2: Connect to Netlify**
-1. Go to [netlify.com](https://netlify.com)
-2. Click "New site from Git"
-3. Connect your GitHub repository
-4. Select the `confql-map` repository
-5. Deploy settings:
-   - **Build command:** (leave empty)
-   - **Publish directory:** `.` (root)
-6. Click "Deploy site"
+### Prerequisites
+- A Netlify account (free tier is sufficient).
+- Your project pushed to a GitHub, GitLab, or Bitbucket repository.
 
-### **Step 3: Custom Domain**
-1. In Netlify dashboard → Site settings → Domain management
-2. Add your custom domain
-3. Update DNS records as instructed
-4. SSL certificate is automatic
+### Steps
+1.  **Log in to Netlify** and go to your dashboard.
+2.  Click **"Add new site"** and select **"Import an existing project"**.
+3.  **Connect to your Git provider** (e.g., GitHub) and authorize Netlify.
+4.  **Choose your repository** for the ConfMap project.
+5.  **Configure Build Settings**:
+    - **Branch to deploy**: `main` (or your primary branch).
+    - **Build command**: `npm run build:prod`
+    - **Publish directory**: `dist`
+6.  Click **"Deploy site"**. Netlify will automatically build and deploy your application.
 
-**✅ Done! Your app is live on Netlify**
+Your site will be live in a few minutes!
 
 ---
 
-## 🐳 Option 2: Deploy to DigitalOcean
+## Option 2: Deploying to DigitalOcean with Docker
 
-### **Prerequisites**
-- DigitalOcean account
-- Droplet with Docker installed
-- Domain name (optional but recommended)
+This method provides more flexibility and is suitable for a production environment where you want more control over the server.
 
-### **Step 1: Create DigitalOcean Droplet**
-1. Create new droplet
-2. Choose Ubuntu 22.04 LTS
-3. Basic plan ($5/month is sufficient)
-4. Add SSH key for secure access
+### Prerequisites
+- A DigitalOcean account.
+- A Droplet (server) created with Docker pre-installed. You can use the "Docker on Ubuntu" one-click app from the DigitalOcean Marketplace.
+- Docker and Docker Compose installed on your local machine.
+- Your project pushed to a Git repository.
 
-### **Step 2: Connect to Your Server**
-```bash
-ssh root@YOUR_SERVER_IP
+### Steps
+
+#### 1. SSH into Your Droplet
+First, connect to your DigitalOcean Droplet:
+```sh
+ssh root@<your_droplet_ip>
 ```
 
-### **Step 3: Install Docker & Docker Compose**
-```bash
-# Update system
-apt update && apt upgrade -y
-
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-
-# Install Docker Compose
-curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-
-# Add user to docker group
-usermod -aG docker $USER
+#### 2. Clone Your Repository
+Clone your project onto the Droplet:
+```sh
+git clone <your_repository_url>
+cd confmap-repo-name # Change to your repo name
 ```
 
-### **Step 4: Deploy Your App**
-```bash
-# Clone your repository
-git clone https://github.com/YOUR_USERNAME/confql-map.git
-cd confql-map
-
-# Deploy
-./deploy.sh
-```
-
-### **Step 5: Configure Domain & SSL**
-```bash
-# Install Certbot for SSL
-apt install certbot python3-certbot-nginx -y
-
-# Get SSL certificate
-certbot --nginx -d yourdomain.com
-
-# Restart nginx
-docker-compose restart
-```
-
-**✅ Done! Your app is live on DigitalOcean**
-
----
-
-## 🔧 Configuration Options
-
-### **Environment Variables**
-Create `.env` file for custom settings:
-```bash
-NODE_ENV=production
-PORT=80
-DOMAIN=yourdomain.com
-```
-
-### **Custom Ports**
-Edit `docker-compose.yml`:
-```yaml
-ports:
-  - "3000:80"  # External:Internal
-```
-
-### **SSL with Let's Encrypt**
-```bash
-# Auto-renewal
-crontab -e
-# Add: 0 12 * * * /usr/bin/certbot renew --quiet
-```
-
----
-
-## 📊 Monitoring & Maintenance
-
-### **View Logs**
-```bash
-# All services
-docker-compose logs -f
-
-# Specific service
-docker-compose logs -f confql-map
-```
-
-### **Update Application**
-```bash
-git pull origin main
-./deploy.sh
-```
-
-### **Health Check**
-```bash
-curl http://localhost/health
-# Should return: "healthy"
-```
-
----
-
-## 🚨 Troubleshooting
-
-### **Port Already in Use**
-```bash
-# Check what's using port 80
-netstat -tulpn | grep :80
-
-# Kill process or change port in docker-compose.yml
-```
-
-### **Permission Denied**
-```bash
-# Fix file permissions
+#### 3. Run the Deployment Script
+The `deploy.sh` script automates the entire process. Make it executable and run it:
+```sh
 chmod +x deploy.sh
-chown -R $USER:$USER .
+./deploy.sh
 ```
 
-### **Docker Build Fails**
-```bash
-# Clean Docker cache
-docker system prune -a
-docker-compose build --no-cache
-```
+The script will:
+- Build the Docker image using `docker-compose`.
+- Start the Nginx service in a container.
+- Perform a health check to ensure the application is running.
+
+#### 4. Access Your Application
+Once the script finishes, you can access your ConfMap application by navigating to `http://<your_droplet_ip>` in your web browser.
+
+### Managing the Application
+- **To stop the application**: `docker-compose down`
+- **To view logs**: `docker-compose logs -f`
+- **To restart**: `docker-compose restart`
 
 ---
 
-## 🔒 Security Checklist
-
-- [ ] Firewall configured (UFW)
-- [ ] SSH key authentication only
-- [ ] Regular security updates
-- [ ] SSL certificate installed
-- [ ] Monitoring set up
-- [ ] Backups configured
-
----
-
-## 💰 Cost Comparison
-
-| Platform | Cost | Features | Best For |
-|----------|------|----------|----------|
-| **Netlify** | Free tier | Static hosting, CDN, SSL | Quick launch, MVP |
-| **DigitalOcean** | $5-10/month | Full control, custom domain | Production, scaling |
-
----
-
-## 🎯 Next Steps
-
-1. **Choose your deployment option**
-2. **Deploy following the guide above**
-3. **Test your application**
-4. **Configure custom domain**
-5. **Set up monitoring**
-
-**Need help?** Check the troubleshooting section or create an issue in the repository!
+Congratulations! You've successfully deployed ConfMap.
