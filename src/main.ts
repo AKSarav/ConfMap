@@ -2,8 +2,50 @@ import './input.css';
 import yaml from 'js-yaml';
 import * as echarts from 'echarts';
 
+/**
+ * ConfMap Color Scheme
+ * 
+ * A carefully curated 13-level color palette designed for optimal visual separation
+ * and contrast between different configuration hierarchy levels:
+ * 
+ * Level 0 (Root): Lavender Blue #d6dffc - calm root anchor
+ * Level 1: Mint Green #b8e0d2 - fresh contrast
+ * Level 2: Soft Amber #ffe6b8 - warm separation from green/blue
+ * Level 3: Aqua Teal #a9e2da - cool reset, distinct from amber
+ * Level 4: Peach #ffd1b3 - warm step down
+ * Level 5: Light Cyan #c0f1ff - icy cool
+ * Level 6: Coral Pink #ffb6b9 - warm and bold
+ * Level 7: Sky Blue #a7d0f2 - subtle but not too close to Level 0
+ * Level 8: Golden Yellow #ffe8a3 - sunny highlight
+ * Level 9: Sage Green #c7e9c0 - earthy cool green
+ * Level 10: Apricot #ffcfa8 - warm pastel
+ * Level 11: Soft Indigo #b5b3ff - deep cool purple for depth
+ * Level 12: Light Rose #f7c6e0 - gentle warm closure
+ */
+
 // Define the color palette inspired by the user's image
-const COLORS = ['#d6dffc', '#c0d0ff', '#b8e0d2', '#d8f3e9'];
+// Carefully selected colors for better contrast and visual separation between levels
+const COLORS = [
+  '#d6dffc',  // Level 0 (Root): Lavender Blue - calm root anchor
+  '#b8e0d2',  // Level 1: Mint Green - fresh contrast
+  '#ffe6b8',  // Level 2: Soft Amber - warm separation from green/blue
+  '#a9e2da',  // Level 3: Aqua Teal - cool reset, distinct from amber
+  '#ffd1b3',  // Level 4: Peach - warm step down
+  '#c0f1ff',  // Level 5: Light Cyan - icy cool
+  '#ffb6b9',  // Level 6: Coral Pink - warm and bold
+  '#a7d0f2',  // Level 7: Sky Blue - subtle but not too close to Level 0
+  '#ffe8a3',  // Level 8: Golden Yellow - sunny highlight
+  '#c7e9c0',  // Level 9: Sage Green - earthy cool green
+  '#ffcfa8',  // Level 10: Apricot - warm pastel
+  '#b5b3ff',  // Level 11: Soft Indigo - deep cool purple for depth
+  '#f7c6e0'   // Level 12: Light Rose - gentle warm closure
+];
+
+// Function to get column color based on depth
+// Returns the color for the specified depth level using modulo to cycle through colors
+function getColumnColor(depth: number): string {
+  return COLORS[depth % COLORS.length];
+}
 const HIGHLIGHT_COLOR = 'crimson';
 const CLUSTER_THRESHOLD = 10;
 
@@ -42,12 +84,13 @@ let focusedNode: EChartsTreeData | null = null;
  * Recursively transforms data, applying clustering logic for dense nodes.
  */
 function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
+  // Ensure each column (depth level) gets a distinct color
   const node: EChartsTreeData = {
     name,
     depth,
     isParent: false,
     itemStyle: {
-      color: COLORS[depth % COLORS.length],
+      color: getColumnColor(depth),
     },
     label: {
         borderColor: 'transparent',
@@ -75,7 +118,7 @@ function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
         name: clusterName,
         depth: depth + 1,
         isParent: true,
-        itemStyle: { color: COLORS[(depth + 1) % COLORS.length] },
+        itemStyle: { color: getColumnColor(depth + 1) },
         label: { borderColor: 'transparent', borderWidth: 0 },
         children: chunk.map(child => toEChartsTree(child.value, child.key, depth + 2)),
       };
@@ -99,7 +142,36 @@ function renderChart(data: EChartsTreeData) {
     tooltip: {
       trigger: 'item',
       triggerOn: 'mousemove',
-      formatter: '{b}',
+      formatter: (params: any) => {
+        const { name, depth } = params.data;
+        const columnColor = getColumnColor(depth);
+        return `<div style="padding: 8px;">
+          <div style="font-weight: bold;">${name}</div>
+        </div>`;
+      },
+    },
+    legend: {
+      type: 'scroll',
+      orient: 'vertical',
+      right: 10,
+      top: 20,
+      data: COLORS.map((_, index) => `L${index}`),
+      formatter: (name: string) => {
+        const level = parseInt(name.substring(1));
+        const color = COLORS[level] || '#ccc';
+        const levelNames = [
+          'Root', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L11', 'L12'
+        ];
+        return `<span style="display: inline-block; width: 16px; height: 16px; background-color: ${color}; border-radius: 3px; margin-right: 8px; border: 1px solid rgba(0,0,0,0.2);"></span>${levelNames[level] || name}`;
+      },
+      textStyle: {
+        fontSize: 12,
+      },
+      itemGap: 8,
+      pageTextStyle: {
+        color: '#666',
+      },
+
     },
     series: [
       {
@@ -121,10 +193,10 @@ function renderChart(data: EChartsTreeData) {
           padding: [8, 15],
           borderRadius: 8,
           backgroundColor: 'inherit',
-          borderColor: 'transparent',
-          borderWidth: 0,
+          borderColor: 'rgba(0,0,0,0.1)',
+          borderWidth: 1,
           formatter: (params: any) => {
-            const { name, isParent, collapsed } = params.data;
+            const { name, isParent, collapsed, depth } = params.data;
             if (isParent) {
               const marker = collapsed ? '+' : '-';
               return `{marker| ${marker} }{name| ${name}}`;
@@ -149,9 +221,9 @@ function renderChart(data: EChartsTreeData) {
           }
         },
         lineStyle: {
-          color: 'source',
+          color: 'rgba(0,0,0,0.3)',
           curveness: isRadial ? 0 : 0.5,
-          width: 1.5,
+          width: 2,
         },
         emphasis: {
           focus: 'descendant',

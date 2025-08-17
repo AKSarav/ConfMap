@@ -95,4 +95,34 @@
   .animate-fadeIn {
     animation: fadeIn 0.5s ease-in-out forwards;
   }
+  
+  /* Column color indicators */
+  .column-level-0 { background-color: #d6dffc; }  /* Lavender Blue */
+  .column-level-1 { background-color: #b8e0d2; }  /* Mint Green */
+  .column-level-2 { background-color: #ffe6b8; }  /* Soft Amber */
+  .column-level-3 { background-color: #a9e2da; }  /* Aqua Teal */
+  .column-level-4 { background-color: #ffd1b3; }  /* Peach */
+  .column-level-5 { background-color: #c0f1ff; }  /* Light Cyan */
+  .column-level-6 { background-color: #ffb6b9; }  /* Coral Pink */
+  .column-level-7 { background-color: #a7d0f2; }  /* Sky Blue */
+  .column-level-8 { background-color: #ffe8a3; }  /* Golden Yellow */
+  .column-level-9 { background-color: #c7e9c0; }  /* Sage Green */
+  .column-level-10 { background-color: #ffcfa8; } /* Apricot */
+  .column-level-11 { background-color: #b5b3ff; } /* Soft Indigo */
+  .column-level-12 { background-color: #f7c6e0; } /* Light Rose */
+  
+  /* Enhanced column color utilities */
+  .column-color-0 { color: #d6dffc; }
+  .column-color-1 { color: #b8e0d2; }
+  .column-color-2 { color: #ffe6b8; }
+  .column-color-3 { color: #a9e2da; }
+  .column-color-4 { color: #ffd1b3; }
+  .column-color-5 { color: #c0f1ff; }
+  .column-color-6 { color: #ffb6b9; }
+  .column-color-7 { color: #a7d0f2; }
+  .column-color-8 { color: #ffe8a3; }
+  .column-color-9 { color: #c7e9c0; }
+  .column-color-10 { color: #ffcfa8; }
+  .column-color-11 { color: #b5b3ff; }
+  .column-color-12 { color: #f7c6e0; }
 }

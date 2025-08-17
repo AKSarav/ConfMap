@@ -1,0 +1,88 @@
+# Sample Configuration File for Testing ConfMap Color Scheme
+# This file demonstrates all 13 color levels
+
+# Level 0 (Root) - Lavender Blue #d6dffc
+application:
+  # Level 1 - Mint Green #b8e0d2
+  name: "Sample App"
+  version: "1.0.0"
+  
+  # Level 2 - Soft Amber #ffe6b8
+  database:
+    # Level 3 - Aqua Teal #a9e2da
+    host: "localhost"
+    port: 5432
+    credentials:
+      # Level 4 - Peach #ffd1b3
+      username: "admin"
+      password: "secret"
+      security:
+        # Level 5 - Light Cyan #c0f1ff
+        encryption: "AES-256"
+        ssl: true
+        certificates:
+          # Level 6 - Coral Pink #ffb6b9
+          ca: "/path/to/ca.crt"
+          client: "/path/to/client.crt"
+          validation:
+            # Level 7 - Sky Blue #a7d0f2
+            strict: true
+            timeout: 30
+            retry:
+              # Level 8 - Golden Yellow #ffe8a3
+              attempts: 3
+              backoff: "exponential"
+              limits:
+                # Level 9 - Sage Green #c7e9c0
+                max_attempts: 10
+                max_delay: 60
+                jitter: 0.1
+                policies:
+                  # Level 10 - Apricot #ffcfa8
+                  circuit_breaker: true
+                  fallback: "default"
+                  monitoring:
+                    # Level 11 - Soft Indigo #b5b3ff
+                    metrics: true
+                    logging: "debug"
+                    alerts:
+                      # Level 12 - Light Rose #f7c6e0
+                      email: "admin@example.com"
+                      slack: "#alerts"
+                      pagerduty: "P123456"
+  
+  # Level 2 - Soft Amber #ffe6b8
+  api:
+    # Level 3 - Aqua Teal #a9e2da
+    endpoints:
+      # Level 4 - Peach #ffd1b3
+      users: "/api/v1/users"
+      products: "/api/v1/products"
+      orders: "/api/v1/orders"
+      analytics:
+        # Level 5 - Light Cyan #c0f1ff
+        dashboard: "/api/v1/analytics/dashboard"
+        reports: "/api/v1/analytics/reports"
+        exports:
+          # Level 6 - Coral Pink #ffb6b9
+          csv: "/api/v1/analytics/exports/csv"
+          json: "/api/v1/analytics/exports/json"
+          pdf: "/api/v1/analytics/exports/pdf"
+  
+  # Level 2 - Soft Amber #ffe6b8
+  cache:
+    # Level 3 - Aqua Teal #a9e2da
+    redis:
+      # Level 4 - Peach #ffd1b3
+      host: "cache.example.com"
+      port: 6379
+      databases:
+        # Level 5 - Light Cyan #c0f1ff
+        session: 0
+        user_data: 1
+        analytics: 2
+        temporary:
+          # Level 6 - Coral Pink #ffb6b9
+          queue: 3
+          locks: 4
+          notifications: 5
