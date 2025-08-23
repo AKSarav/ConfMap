@@ -69,41 +69,38 @@
       <main class="w-full">
         <!-- Controls Section -->
         <div class="border-b border-gray-200 px-6 py-4 bg-gray-50">
-          <div class="grid md:grid-cols-3 gap-6">
+          <div class="flex items-center justify-start gap-8">
             <!-- File Upload -->
-            <div class="space-y-2">
-              <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">
-                📁 Upload Configuration File
-              </label>
-              <input type="file" id="file-upload" accept=".yml,.yaml,.json" class="file-upload">
-              <p class="text-xs text-gray-500">Supports YAML, YML, and JSON files</p>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <label for="file-upload" class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                  📁 Upload File
+                </label>
+                <input type="file" id="file-upload" accept=".yml,.yaml,.json" class="file-upload-compact">
+              </div>
             </div>
 
             <!-- Search Box -->
-            <div class="space-y-2">
-              <label for="search-input" class="block text-sm font-medium text-gray-700 mb-2">
-                🔍 Search Nodes
-              </label>
-              <div class="flex gap-2">
-                <input type="search" id="search-input" placeholder="Search for nodes..." class="search-input">
-                <button id="search-button" class="btn-primary whitespace-nowrap">Search</button>
-              </div>
+            <div class="flex items-center gap-2">
+              <input type="search" id="search-input" placeholder="Search nodes..." class="search-input-compact">
+              <button id="search-button" class="btn-primary-compact">Search</button>
             </div>
 
-            <!-- Layout Controls -->
-            <div class="space-y-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                🎨 Layout Options
+            <!-- Layout Dropdown -->
+            <div class="flex items-center gap-2">
+              <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                🎨 Layout
               </label>
-              <div class="flex gap-2">
-                <button id="lr-layout-button" class="btn-secondary active">Horizontal</button>
-                <button id="tb-layout-button" class="btn-secondary">Vertical</button>
-                <button id="radial-layout-button" class="btn-secondary">Radial</button>
-              </div>
+              <select id="layout-dropdown" class="dropdown-select">
+                <option value="LR">Horizontal</option>
+                <option value="TB">Vertical</option>
+                <option value="radial">Radial</option>
+              </select>
             </div>
-            
+
 
           </div>
+        </div>
 
         <!-- Mind Map Container -->
         <div class="w-full">

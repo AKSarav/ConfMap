@@ -69,16 +69,20 @@ const fileUpload = document.getElementById('file-upload') as HTMLInputElement;
 const mindmapContainer = document.getElementById('mindmap-container') as HTMLDivElement;
 const searchInput = document.getElementById('search-input') as HTMLInputElement;
 const searchButton = document.getElementById('search-button') as HTMLButtonElement;
-const lrLayoutButton = document.getElementById('lr-layout-button') as HTMLButtonElement;
-const tbLayoutButton = document.getElementById('tb-layout-button') as HTMLButtonElement;
-const radialLayoutButton = document.getElementById('radial-layout-button') as HTMLButtonElement;
+const layoutDropdown = document.getElementById('layout-dropdown') as HTMLSelectElement;
 const contextMenu = document.getElementById('context-menu') as HTMLDivElement;
 const focusNodeButton = document.getElementById('focus-node-button') as HTMLLIElement;
+const displayDropdown = document.getElementById('display-dropdown') as HTMLSelectElement;
+
 
 const myChart = echarts.init(mindmapContainer);
 let originalTreeData: EChartsTreeData | null = null;
 let currentLayout: 'LR' | 'TB' | 'radial' = 'LR';
 let focusedNode: EChartsTreeData | null = null;
+let gridEnabled = true; // Grid always enabled by default for better UX
+let lineShadowsEnabled = true;
+let smoothCurvesEnabled = true; // Smooth curves by default
+let showArrowsEnabled = false; // Arrows disabled by default
 
 /**
  * Recursively transforms data, applying clustering logic for dense nodes.
@@ -134,17 +138,93 @@ function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
 }
 
 /**
+ * Creates a grid pattern for the background
+ */
+function createGridPattern(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d')!;
+  const size = 20; // Grid cell size
+  
+  canvas.width = size;
+  canvas.height = size;
+  
+  // Set background
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(0, 0, size, size);
+  
+  // Draw grid lines
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 0.5;
+  
+  // Vertical line
+  ctx.beginPath();
+  ctx.moveTo(size, 0);
+  ctx.lineTo(size, size);
+  ctx.stroke();
+  
+  // Horizontal line
+  ctx.beginPath();
+  ctx.moveTo(0, size);
+  ctx.lineTo(size, size);
+  ctx.stroke();
+  
+  return canvas;
+}
+
+
+
+/**
+ * Initializes an empty chart with grid background for better UX
+ */
+function initializeEmptyChart() {
+  const option: echarts.EChartsOption = {
+    backgroundColor: {
+      type: 'pattern',
+      image: createGridPattern(),
+      repeat: 'repeat'
+    },
+    title: {
+      text: 'Upload a configuration file to visualize',
+      subtext: 'Supports YAML, YML, and JSON files',
+      left: 'center',
+      top: '40%',
+      textStyle: {
+        color: '#666',
+        fontSize: 18,
+        fontWeight: 'normal'
+      },
+      subtextStyle: {
+        color: '#999',
+        fontSize: 14
+      }
+    },
+    series: []
+  };
+  
+  myChart.setOption(option);
+}
+
+
+
+
+
+/**
  * Updates the chart with the given data and options.
  */
 function renderChart(data: EChartsTreeData) {
   const isRadial = currentLayout === 'radial';
   const option: echarts.EChartsOption = {
+    // Always show grid for better UX
+    backgroundColor: {
+      type: 'pattern',
+      image: createGridPattern(),
+      repeat: 'repeat'
+    },
     tooltip: {
       trigger: 'item',
       triggerOn: 'mousemove',
       formatter: (params: any) => {
-        const { name, depth } = params.data;
-        const columnColor = getColumnColor(depth);
+        const { name } = params.data;
         return `<div style="padding: 8px;">
           <div style="font-weight: bold;">${name}</div>
         </div>`;
@@ -184,8 +264,15 @@ function renderChart(data: EChartsTreeData) {
         bottom: isRadial ? '15%' : '2%',
         right: isRadial ? '15%' : '20%',
         roam: true,
-        symbol: 'none',
-        symbolSize: 1,
+        // Hollow ring at the junction using node symbol (tree doesn't support edgeSymbol)
+        symbol: 'emptyCircle',
+        symbolSize: 8,
+        symbolOffset: [-10, 0],
+        zlevel: 2,
+        itemStyle: {
+          borderColor: '#666',
+          borderWidth: 1.5,
+        },
         label: {
           position: isRadial ? 'inside' : (currentLayout === 'TB' ? 'top' : 'right'),
           verticalAlign: 'middle',
@@ -193,10 +280,10 @@ function renderChart(data: EChartsTreeData) {
           padding: [8, 15],
           borderRadius: 8,
           backgroundColor: 'inherit',
-          borderColor: 'rgba(0,0,0,0.1)',
-          borderWidth: 1,
+          borderColor: 'transparent',
+          borderWidth: 0,
           formatter: (params: any) => {
-            const { name, isParent, collapsed, depth } = params.data;
+            const { name, isParent, collapsed } = params.data;
             if (isParent) {
               const marker = collapsed ? '+' : '-';
               return `{marker| ${marker} }{name| ${name}}`;
@@ -222,16 +309,34 @@ function renderChart(data: EChartsTreeData) {
         },
         lineStyle: {
           color: 'rgba(0,0,0,0.3)',
-          curveness: isRadial ? 0 : 0.5,
+          curveness: isRadial ? 0 : (smoothCurvesEnabled ? 0.5 : 0),
           width: 2,
+          shadowBlur: lineShadowsEnabled ? 4 : 0,
+          shadowColor: lineShadowsEnabled ? 'rgba(0,0,0,0.4)' : 'transparent',
+          shadowOffsetX: lineShadowsEnabled ? 1 : 0,
+          shadowOffsetY: lineShadowsEnabled ? 1 : 0,
         },
+
         emphasis: {
           focus: 'descendant',
+          lineStyle: {
+            color: 'rgba(59, 130, 246, 0.8)',
+            width: 3,
+            shadowBlur: lineShadowsEnabled ? 8 : 0,
+            shadowColor: lineShadowsEnabled ? 'rgba(59, 130, 246, 0.5)' : 'transparent',
+            shadowOffsetX: lineShadowsEnabled ? 2 : 0,
+            shadowOffsetY: lineShadowsEnabled ? 2 : 0,
+          },
+          label: {
+            borderColor: 'rgba(59, 130, 246, 0.8)',
+            borderWidth: 3,
+          }
         },
         expandAndCollapse: true,
         animationDuration: 550,
         animationDurationUpdate: 750,
       },
+
     ],
   };
   myChart.setOption(option, { notMerge: true });
@@ -306,19 +411,52 @@ function handleSearch() {
   }
 }
 
-function updateActiveButton() {
-    lrLayoutButton.classList.toggle('active', currentLayout === 'LR');
-    tbLayoutButton.classList.toggle('active', currentLayout === 'TB');
-    radialLayoutButton.classList.toggle('active', currentLayout === 'radial');
+function updateLayoutDropdown() {
+    layoutDropdown.value = currentLayout;
 }
 
 function handleLayoutChange(layout: 'LR' | 'TB' | 'radial') {
     if (!originalTreeData) return;
     currentLayout = layout;
-    updateActiveButton();
+    updateLayoutDropdown();
     myChart.clear();
     renderChart(originalTreeData);
 }
+
+function handleDisplayOptionChange() {
+    const displayMode = displayDropdown.value;
+    
+    switch (displayMode) {
+        case 'default':
+            smoothCurvesEnabled = true;
+            lineShadowsEnabled = true;
+            showArrowsEnabled = false;
+            break;
+        case 'minimal':
+            smoothCurvesEnabled = false;
+            lineShadowsEnabled = false;
+            showArrowsEnabled = false;
+            break;
+        case 'enhanced':
+            smoothCurvesEnabled = true;
+            lineShadowsEnabled = true;
+            showArrowsEnabled = true;
+            break;
+        case 'technical':
+            smoothCurvesEnabled = false;
+            lineShadowsEnabled = true;
+            showArrowsEnabled = true;
+            break;
+    }
+    
+    if (originalTreeData) {
+        renderChart(originalTreeData);
+    }
+}
+
+
+
+
 
 function handleFocus() {
     if (!focusedNode || !originalTreeData) return;
@@ -358,10 +496,12 @@ searchButton.addEventListener('click', handleSearch);
 searchInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') handleSearch();
 });
-lrLayoutButton.addEventListener('click', () => handleLayoutChange('LR'));
-tbLayoutButton.addEventListener('click', () => handleLayoutChange('TB'));
-radialLayoutButton.addEventListener('click', () => handleLayoutChange('radial'));
+layoutDropdown.addEventListener('change', (e) => handleLayoutChange((e.target as HTMLSelectElement).value as 'LR' | 'TB' | 'radial'));
 focusNodeButton.addEventListener('click', handleFocus);
+
+// Display options event listener
+displayDropdown.addEventListener('change', handleDisplayOptionChange);
+
 
 window.addEventListener('click', () => {
     contextMenu.style.display = 'none';
@@ -377,6 +517,15 @@ myChart.on('contextmenu', (params) => {
         contextMenu.style.display = 'block';
     }
 });
+
+// Initialize layout dropdown
+updateLayoutDropdown();
+
+// Initialize display dropdown to default
+displayDropdown.value = 'default';
+
+// Initialize chart with grid background for better UX in idle state
+initializeEmptyChart();
 
 window.addEventListener('resize', () => {
   myChart.resize();
