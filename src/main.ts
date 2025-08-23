@@ -58,6 +58,8 @@ type EChartsTreeData = {
   collapsed?: boolean;
   itemStyle: {
     color: string;
+    borderColor: string;
+    borderWidth: number;
   };
   label: {
     borderColor: string;
@@ -94,9 +96,12 @@ function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
     depth,
     isParent: false,
     itemStyle: {
-      color: getColumnColor(depth),
+      color: '#000',
+      borderColor: '#000',
+      borderWidth: 1.5,
     },
     label: {
+        backgroundColor: getColumnColor(depth),
         borderColor: 'transparent',
         borderWidth: 0,
     }
@@ -122,8 +127,8 @@ function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
         name: clusterName,
         depth: depth + 1,
         isParent: true,
-        itemStyle: { color: getColumnColor(depth + 1) },
-        label: { borderColor: 'transparent', borderWidth: 0 },
+        itemStyle: { color: '#000', borderColor: '#000', borderWidth: 1.5 },
+        label: { backgroundColor: getColumnColor(depth + 1), borderColor: 'transparent', borderWidth: 0 },
         children: chunk.map(child => toEChartsTree(child.value, child.key, depth + 2)),
       };
       node.children.push(clusterNode);
@@ -270,7 +275,7 @@ function renderChart(data: EChartsTreeData) {
         symbolOffset: [-10, 0],
         zlevel: 2,
         itemStyle: {
-          borderColor: '#666',
+          borderColor: '#000',
           borderWidth: 1.5,
         },
         label: {
