@@ -95,6 +95,66 @@
     background-color: rgb(229 231 235);
   }
 
+  /* Professional Menu Bar Styling */
+  .file-upload-compact {
+    @apply text-sm text-gray-600 bg-white border border-gray-300 rounded-lg px-3 py-2 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200;
+  }
+
+  .file-upload-compact::file-selector-button {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200;
+    border: none;
+    margin-right: 0.75rem;
+  }
+
+  .search-input-compact {
+    @apply w-64 px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400;
+  }
+
+  .btn-primary-compact {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm;
+  }
+
+  .dropdown-select {
+    @apply bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer;
+  }
+
+  /* Enhanced Controls Section */
+  .controls-section {
+    border-bottom: 1px solid rgb(229 231 235);
+    padding: 1rem 1.5rem;
+    background: linear-gradient(to right, rgb(249 250 251), rgb(255 255 255));
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .controls-section .flex {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2rem;
+  }
+
+  .controls-section .flex > div {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .controls-section label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgb(55 65 81);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Icon styling for better visual hierarchy */
+  .controls-section .emoji-icon {
+    font-size: 1.125rem;
+    opacity: 0.8;
+  }
+
   /* Idle-state grid background for the mind map container - matches ECharts createGridPattern */
   .grid-bg {
     /* ECharts grid background fill */
