@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ConfMap | Visualize YAML & JSON as Interactive Mind Maps</title>
+    <meta name="description" content="ConfMap transforms your YAML and JSON configuration files into intuitive, interactive mind maps. Explore, search, and understand complex configs at a glance." />
+    <meta name="keywords" content="ConfMap, JSON mind map, YAML mind map, config visualization, interactive mind map, configuration files, dev tools" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://confmap.com/" />
+    <meta property="og:title" content="ConfMap | Interactive Mind Maps for Config Files" />
+    <meta property="og:description" content="Transform YAML and JSON into interactive mind maps. Visualize complex configuration structures with ease." />
+    <meta property="og:image" content="/images/ConfMap-Logo.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://confmap.com/" />
+    <meta name="twitter:title" content="ConfMap | Visualize Config Files" />
+    <meta name="twitter:description" content="Transform YAML and JSON into interactive mind maps. Visualize complex configuration structures with ease." />
+    <meta name="twitter:image" content="/images/ConfMap-Logo.png" />
+
+    <link rel="icon" href="/images/ConfMap-Logo.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: #1f2937;
+        background-color: #ffffff;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+      
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.25);
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.35);
+      }
+      
+      .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        color: #374151;
+        padding: 0.875rem 2rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-secondary:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+        transform: translateY(-2px);
+      }
+      
+      .hero {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 6rem 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        opacity: 0.5;
+      }
+      
+      .hero-content {
+        position: relative;
+        z-index: 2;
+      }
+      
+      .hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+      }
+      
+      .hero p {
+        font-size: 1.25rem;
+        color: #64748b;
+        margin-bottom: 2.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .features {
+        padding: 6rem 0;
+        background: white;
+      }
+      
+      .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+      }
+      
+      .section-header h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+      }
+      
+      .section-header p {
+        font-size: 1.125rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+      
+      .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+      }
+      
+      .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border-color: #3b82f6;
+      }
+      
+      .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        color: white;
+        font-size: 1.5rem;
+      }
+      
+      .feature-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 1rem;
+      }
+      
+      .feature-card p {
+        color: #64748b;
+        line-height: 1.6;
+      }
+      
+      .how-it-works {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      }
+      
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+      
+      .step {
+        text-align: center;
+        position: relative;
+      }
+      
+      .step-number {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin: 0 auto 1.5rem;
+      }
+      
+      .step h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 1rem;
+      }
+      
+      .step p {
+        color: #64748b;
+        line-height: 1.6;
+      }
+      
+      .cta {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        text-align: center;
+      }
+      
+      .cta h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+      
+      .cta p {
+        font-size: 1.125rem;
+        color: #cbd5e1;
+        margin-bottom: 2.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .footer {
+        background: #0f172a;
+        color: #cbd5e1;
+        padding: 3rem 0;
+        text-align: center;
+      }
+      
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      
+      .footer a {
+        color: #60a5fa;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+      
+      .footer a:hover {
+        color: #93c5fd;
+      }
+      
+      @media (max-width: 768px) {
+        .hero-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .footer-content {
+          flex-direction: column;
+          text-align: center;
+        }
+        
+        .container {
+          padding: 0 1rem;
+        }
+      }
+      
+      .github-corner {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: #24292e;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 24px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .github-corner:hover {
+        background: #0366d6;
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- GitHub Icon -->
+    <a href="https://github.com/AKSarav/YamlQL" class="github-corner" aria-label="View source on GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <img src="/images/ConfMap-Logo.png" alt="ConfMap Logo" style="width: 20vh; height: 20vh;" />
+          <h1>Transform Config Files Into Interactive Mind Maps</h1>
+          <p>
+            ConfMap instantly converts your YAML and JSON configuration files into beautiful, 
+            interactive mind maps. Explore complex structures, search nodes, and understand 
+            your configs at a glance.
+          </p>
+          <div class="hero-buttons">
+            <a href="map.html" class="btn-primary">
+              <i class="fas fa-rocket"></i>
+              Try ConfMap Free
+            </a>
+            <a href="https://github.com/AKSarav/YamlQL" class="btn-secondary">
+              <i class="fab fa-github"></i>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <div class="container">
+        <div class="section-header">
+          <h2>Why Choose ConfMap?</h2>
+          <p>
+            Built for developers who need to quickly understand and navigate complex configuration structures
+          </p>
+        </div>
+        
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-sitemap"></i>
+            </div>
+            <h3>Smart Auto-Layout</h3>
+            <p>
+              Choose from horizontal, vertical, or radial layouts. ConfMap automatically 
+              arranges nodes for optimal readability and navigation.
+            </p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <h3>Lightning-Fast Search</h3>
+            <p>
+              Find any key or value instantly with our powerful search functionality. 
+              Navigate large configs in seconds, not minutes.
+            </p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-mouse-pointer"></i>
+            </div>
+            <h3>Interactive Navigation</h3>
+            <p>
+              Click, drag, and collapse nodes to explore your configuration structure. 
+              Intuitive controls make navigation effortless.
+            </p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-palette"></i>
+            </div>
+            <h3>Visual Hierarchy</h3>
+            <p>
+              Color-coded levels and clear visual separation help you understand 
+              the structure and relationships in your configuration files.
+            </p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-file-code"></i>
+            </div>
+            <h3>Multiple Formats</h3>
+            <p>
+              Support for YAML (.yml, .yaml) and JSON files. More formats coming soon 
+              to help you visualize any configuration structure.
+            </p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Privacy First</h3>
+            <p>
+              Your files never leave your browser. ConfMap processes everything locally 
+              for maximum security and privacy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+      <div class="container">
+        <div class="section-header">
+          <h2>How It Works</h2>
+          <p>
+            Get started with ConfMap in just three simple steps
+          </p>
+        </div>
+        
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Upload Your File</h3>
+            <p>
+              Drag and drop your YAML or JSON file, or click to browse. 
+              ConfMap supports all standard configuration formats.
+            </p>
+          </div>
+          
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>Instant Visualization</h3>
+            <p>
+              Watch as ConfMap automatically converts your configuration 
+              into a beautiful, interactive mind map in seconds.
+            </p>
+          </div>
+          
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Explore & Navigate</h3>
+            <p>
+              Use search, zoom, and interactive controls to explore your 
+              configuration structure and find what you need quickly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="cta">
+      <div class="container">
+        <h2>Ready to Visualize Your Configs?</h2>
+        <p>
+          Join thousands of developers who use ConfMap to understand and navigate 
+          complex configuration files every day.
+        </p>
+        <a href="map.html" class="btn-primary">
+          <i class="fas fa-rocket"></i>
+          Start Visualizing Now
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div>
+            <p>&copy; 2025 ConfMap. Built with ❤️ by the ConfQL team.</p>
+          </div>
+          <div>
+            <a href="https://github.com/AKSarav/YamlQL" target="_blank">
+              <i class="fab fa-github"></i> View Source on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
