@@ -95,9 +95,9 @@ function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
     depth,
     isParent: false,
     itemStyle: {
-      color: '#000',
-      borderColor: '#000',
-      borderWidth: 1.5,
+      color: 'transparent',
+      borderColor: 'transparent',
+      borderWidth: 0,
     },
     label: {
         backgroundColor: getColumnColor(depth),
@@ -126,7 +126,7 @@ function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
         name: clusterName,
         depth: depth + 1,
         isParent: true,
-        itemStyle: { color: '#000', borderColor: '#000', borderWidth: 1.5 },
+        itemStyle: { color: 'transparent', borderColor: 'transparent', borderWidth: 0 },
         label: { backgroundColor: getColumnColor(depth + 1), borderColor: 'transparent', borderWidth: 0 },
         children: chunk.map(child => toEChartsTree(child.value, child.key, depth + 2)),
       };
@@ -268,14 +268,13 @@ function renderChart(data: EChartsTreeData) {
         bottom: isRadial ? '15%' : '2%',
         right: isRadial ? '15%' : '20%',
         roam: true,
-        // Hollow ring at the junction using node symbol (tree doesn't support edgeSymbol)
-        symbol: 'emptyCircle',
-        symbolSize: 8,
-        symbolOffset: [-10, 0],
         zlevel: 2,
+        symbol: 'none',
+        symbolSize: 0,
         itemStyle: {
-          borderColor: '#000',
-          borderWidth: 1.5,
+          borderColor: 'transparent',
+          borderWidth: 0,
+          color: 'transparent',
         },
         label: {
           position: isRadial ? 'inside' : (currentLayout === 'TB' ? 'top' : 'right'),
