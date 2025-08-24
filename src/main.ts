@@ -62,6 +62,7 @@ type EChartsTreeData = {
     borderWidth: number;
   };
   label: {
+    backgroundColor?: string;
     borderColor: string;
     borderWidth: number;
   }
@@ -81,10 +82,8 @@ const myChart = echarts.init(mindmapContainer);
 let originalTreeData: EChartsTreeData | null = null;
 let currentLayout: 'LR' | 'TB' | 'radial' = 'LR';
 let focusedNode: EChartsTreeData | null = null;
-let gridEnabled = true; // Grid always enabled by default for better UX
 let lineShadowsEnabled = true;
 let smoothCurvesEnabled = true; // Smooth curves by default
-let showArrowsEnabled = false; // Arrows disabled by default
 
 /**
  * Recursively transforms data, applying clustering logic for dense nodes.
@@ -435,22 +434,18 @@ function handleDisplayOptionChange() {
         case 'default':
             smoothCurvesEnabled = true;
             lineShadowsEnabled = true;
-            showArrowsEnabled = false;
             break;
         case 'minimal':
             smoothCurvesEnabled = false;
             lineShadowsEnabled = false;
-            showArrowsEnabled = false;
             break;
         case 'enhanced':
             smoothCurvesEnabled = true;
             lineShadowsEnabled = true;
-            showArrowsEnabled = true;
             break;
         case 'technical':
             smoothCurvesEnabled = false;
             lineShadowsEnabled = true;
-            showArrowsEnabled = true;
             break;
     }
     
