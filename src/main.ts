@@ -491,6 +491,61 @@ function handleFocus() {
     focusedNode = null;
 }
 
+/**
+ * Downloads the current mind map as a PNG image
+ */
+function downloadAsPNG() {
+    if (!myChart) return;
+    
+    try {
+        // Get the chart as base64 data URL
+        const dataURL = myChart.getDataURL({
+            type: 'png',
+            pixelRatio: 2, // Higher quality
+            backgroundColor: '#ffffff'
+        });
+        
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.download = 'confmap-mindmap.png';
+        link.href = dataURL;
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show success feedback
+        const downloadBtn = document.getElementById('download-png-btn');
+        if (downloadBtn) {
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<span class="emoji-icon">✅</span> Saved!';
+            downloadBtn.style.backgroundColor = '#10b981'; // Green color
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.style.backgroundColor = '';
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('Error downloading PNG:', error);
+        // Show error feedback
+        const downloadBtn = document.getElementById('download-png-btn');
+        if (downloadBtn) {
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<span class="emoji-icon">❌</span> Error';
+            downloadBtn.style.backgroundColor = '#ef4444'; // Red color
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.style.backgroundColor = '';
+            }, 2000);
+        }
+    }
+}
+
 // Event Listeners
 searchButton.addEventListener('click', handleSearch);
 searchInput.addEventListener('keypress', (e) => {
@@ -498,6 +553,12 @@ searchInput.addEventListener('keypress', (e) => {
 });
 layoutDropdown.addEventListener('change', (e) => handleLayoutChange((e.target as HTMLSelectElement).value as 'LR' | 'TB' | 'radial'));
 focusNodeButton.addEventListener('click', handleFocus);
+
+// Download PNG button event listener
+const downloadPngBtn = document.getElementById('download-png-btn');
+if (downloadPngBtn) {
+    downloadPngBtn.addEventListener('click', downloadAsPNG);
+}
 
 // Display options event listener (if present)
 displayDropdown?.addEventListener('change', handleDisplayOptionChange);
