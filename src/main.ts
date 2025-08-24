@@ -69,6 +69,8 @@ type EChartsTreeData = {
 };
 
 const fileUpload = document.getElementById('file-upload') as HTMLInputElement;
+const chooseFileBtn = document.getElementById('choose-file-btn') as HTMLButtonElement | null;
+const selectedFileName = document.getElementById('selected-file-name') as HTMLSpanElement | null;
 const mindmapContainer = document.getElementById('mindmap-container') as HTMLDivElement;
 const searchInput = document.getElementById('search-input') as HTMLInputElement;
 const searchButton = document.getElementById('search-button') as HTMLButtonElement;
@@ -345,9 +347,18 @@ function renderChart(data: EChartsTreeData) {
   myChart.setOption(option, { notMerge: true });
 }
 
+// Custom file trigger for consistent UI
+if (chooseFileBtn) {
+  chooseFileBtn.addEventListener('click', () => fileUpload?.click());
+}
+
 fileUpload.addEventListener('change', (event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (!file) return;
+
+  if (selectedFileName) {
+    selectedFileName.textContent = file.name;
+  }
 
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -557,6 +568,38 @@ focusNodeButton.addEventListener('click', handleFocus);
 const downloadPngBtn = document.getElementById('download-png-btn');
 if (downloadPngBtn) {
     downloadPngBtn.addEventListener('click', downloadAsPNG);
+}
+
+// Fullscreen functionality - simple header toggle
+let isFullscreen = false;
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+const fullscreenText = document.querySelector('.fullscreen-text');
+
+function toggleFullscreen() {
+    isFullscreen = !isFullscreen;
+    
+    if (isFullscreen) {
+        // Enter fullscreen - hide header
+        document.body.classList.add('fullscreen-mode');
+        if (fullscreenText) {
+            fullscreenText.textContent = 'Exit Fullscreen';
+        }
+    } else {
+        // Exit fullscreen - show header
+        document.body.classList.remove('fullscreen-mode');
+        if (fullscreenText) {
+            fullscreenText.textContent = 'Fullscreen';
+        }
+    }
+    
+    // Resize chart after layout change
+    setTimeout(() => {
+        myChart.resize();
+    }, 100);
+}
+
+if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
 }
 
 // Display options event listener (if present)

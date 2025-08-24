@@ -83,14 +83,14 @@
         <!-- Controls Section -->
         <div class="controls-section">
           <div class="flex items-center justify-start gap-8">
-            <!-- File Upload -->
-            <div class="flex items-center gap-4">
-              <div class="flex items-center gap-2">
-                <label for="file-upload" class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                  <span class="emoji-icon">📁</span> Upload File
-                </label>
-                <input type="file" id="file-upload" accept=".yml,.yaml,.json" class="file-upload-compact">
-              </div>
+            <!-- File Upload (custom-styled for consistent height) -->
+            <div class="flex items-center gap-2">
+              <label for="file-upload" class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                <span class="emoji-icon">📁</span> Upload File
+              </label>
+              <input type="file" id="file-upload" accept=".yml,.yaml,.json" class="visually-hidden" />
+              <button id="choose-file-btn" class="btn-secondary-compact">Choose file</button>
+              <span id="selected-file-name" class="text-sm text-gray-500">No file chosen</span>
             </div>
 
             <!-- Search Box -->
@@ -113,8 +113,18 @@
 
             <!-- Download PNG Button -->
             <div class="flex items-center gap-2">
-              <button id="download-png-btn" class="btn-primary-compact flex items-center gap-2">
-                <p class="text-sm">Export as PNG ↓</p>
+              <button id="download-png-btn" class="btn-primary-compact">
+                <span class="text-sm">Export as PNG ↓</span>
+              </button>
+            </div>
+
+            <!-- Fullscreen Button -->
+            <div class="flex items-center gap-2">
+              <button id="fullscreen-btn" class="btn-fullscreen">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                </svg>
+                <span class="fullscreen-text">Fullscreen</span>
               </button>
             </div>
 

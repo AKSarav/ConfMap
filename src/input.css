@@ -96,26 +96,37 @@
   }
 
   /* Professional Menu Bar Styling */
-  .file-upload-compact {
-    @apply text-sm text-gray-600 bg-white border border-gray-300 rounded-lg px-3 py-2 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200;
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
   }
 
-  .file-upload-compact::file-selector-button {
-    @apply bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200;
-    border: none;
-    margin-right: 0.75rem;
+  .btn-secondary-compact {
+    @apply bg-white border border-gray-300 text-gray-800 px-4 rounded-lg text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200;
+    height: 36px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle;
   }
 
   .search-input-compact {
-    @apply w-64 px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400;
+    @apply w-64 px-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400;
+    height: 36px; /* Fixed height */
   }
 
   .btn-primary-compact {
-    @apply bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm;
+    @apply bg-blue-600 text-white px-4 py-0 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm leading-none;
+    height: 36px; /* Fixed height */
+    min-width: 120px; /* Ensure consistent width feel */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    appearance: none;
+    -webkit-appearance: none;
   }
 
   .dropdown-select {
-    @apply bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer;
+    @apply bg-white border border-gray-300 rounded-lg px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer;
+    height: 36px; /* Fixed height */
   }
 
   /* Enhanced Controls Section */
@@ -130,13 +141,16 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 2rem;
+    gap: 1.5rem;
+    min-height: 44px; /* Ensure consistent height */
+    flex-wrap: nowrap; /* Prevent wrapping */
   }
 
   .controls-section .flex > div {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    height: 44px; /* Fixed height for all control groups */
   }
 
   .controls-section label {
@@ -153,6 +167,34 @@
   .controls-section .emoji-icon {
     font-size: 1.125rem;
     opacity: 0.8;
+  }
+
+  /* Fullscreen styling - hide header mode */
+  .fullscreen-mode header {
+    display: none !important;
+  }
+
+  .fullscreen-mode #mindmap-container {
+    height: calc(100vh - 80px) !important;
+    min-height: calc(100vh - 80px) !important;
+  }
+
+  /* Adjust main container when in fullscreen */
+  .fullscreen-mode main {
+    height: 100vh;
+  }
+
+  .btn-fullscreen {
+    @apply bg-gray-100 text-gray-700 px-4 py-0 rounded-lg text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 leading-none;
+    height: 36px;
+    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    vertical-align: middle;
+    appearance: none;
+    -webkit-appearance: none;
   }
 
   /* Idle State Message Styling */
