@@ -8,7 +8,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        map: resolve(__dirname, 'map.html')
+        map: resolve(__dirname, 'map.html'),
+        confmap: resolve(__dirname, 'confmap.html')
       },
       output: {
         manualChunks: {
