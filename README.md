@@ -21,30 +21,6 @@ Upload your YAML, JSON, or YML files and instantly see them transformed into bea
 - **🎯 Node Focus**: Right-click to focus on specific nodes
 - **📊 Visual Hierarchy**: Clear column-based organization
 
-## 🚀 Quick Start
-
-1. **Go to [https://confmap.com](https://confmap.com)**
-2. **Upload your YAML, JSON, or YML file**
-3. **Explore the interactive mind map**
-4. **Use search, zoom, and different layouts**
-
-## 🎨 Color Scheme
-
-| Level | Color Name | Hex Code | Description |
-|-------|------------|----------|-------------|
-| **0** | Lavender Blue | `#d6dffc` | Calm root anchor |
-| **1** | Mint Green | `#b8e0d2` | Fresh contrast |
-| **2** | Soft Amber | `#ffe6b8` | Warm separation from green/blue |
-| **3** | Aqua Teal | `#a9e2da` | Cool reset, distinct from amber |
-| **4** | Peach | `#ffd1b3` | Warm step down |
-| **5** | Light Cyan | `#c0f1ff` | Icy cool |
-| **6** | Coral Pink | `#ffb6b9` | Warm and bold |
-| **7** | Sky Blue | `#a7d0f2` | Subtle but not too close to Level 0 |
-| **8** | Golden Yellow | `#ffe8a3` | Sunny highlight |
-| **9** | Sage Green | `#c7e9c0` | Earthy cool green |
-| **10** | Apricot | `#ffcfa8` | Warm pastel |
-| **11** | Soft Indigo | `#b5b3ff` | Deep cool purple for depth |
-| **12** | Light Rose | `#f7c6e0` | Gentle warm closure |
 
 ## 🚀 Getting Started
 
