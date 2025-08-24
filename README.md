@@ -1,6 +1,15 @@
+[![Build](https://img.shields.io/badge/build-passing-brightgreen)](#)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+
 # ConfMap
 
-A sophisticated mind map visualization tool for YAML, JSON, and YML configuration files with an intelligent 13-level color coding system.
+An open-source library for mind map visualization of YAML, JSON, and YML configuration files, featuring an intelligent 13-level color-coding system.
+
+## 🚀 Try ConfMap Now
+**Visit [https://confmap.com](https://confmap.com) to use the interactive visualizer**
+
+Upload your YAML, JSON, or YML files and instantly see them transformed into beautiful, interactive mind maps with intelligent 13-level color coding.
 
 ## ✨ Features
 
@@ -12,9 +21,14 @@ A sophisticated mind map visualization tool for YAML, JSON, and YML configuratio
 - **🎯 Node Focus**: Right-click to focus on specific nodes
 - **📊 Visual Hierarchy**: Clear column-based organization
 
-## 🎨 Color Scheme
+## 🚀 Quick Start
 
-ConfMap uses a carefully curated 13-level color palette designed for optimal visual separation and contrast:
+1. **Go to [https://confmap.com](https://confmap.com)**
+2. **Upload your YAML, JSON, or YML file**
+3. **Explore the interactive mind map**
+4. **Use search, zoom, and different layouts**
+
+## 🎨 Color Scheme
 
 | Level | Color Name | Hex Code | Description |
 |-------|------------|----------|-------------|
@@ -34,16 +48,20 @@ ConfMap uses a carefully curated 13-level color palette designed for optimal vis
 
 ## 🚀 Getting Started
 
-1. **Upload Configuration File**: Drag and drop or select a YAML, JSON, or YML file
-2. **Explore the Mind Map**: Navigate through the hierarchical structure
-3. **Use Different Layouts**: Switch between Horizontal, Vertical, and Radial views
-4. **Search for Nodes**: Use the search functionality to find specific elements
-5. **Focus on Nodes**: Right-click nodes to focus and expand their paths
+**Option 1: Use the Hosted Version (Recommended)**
+1. Visit [https://confmap.com](https://confmap.com)
+2. Upload your configuration file
+3. Start exploring immediately
+
+**Option 2: Run Locally**
+1. Clone this repository
+2. Install dependencies with `npm install`
+3. Run `npm run dev` for development
+4. Open `map.html` in your browser
 
 ## 📁 Sample Files
 
-- `sample-config.yaml` - Demonstrates all 13 color levels
-- Upload your own configuration files to see the color coding in action
+**Try it now at [https://confmap.com](https://confmap.com)** with your own configuration files to see the intelligent 13-level color coding in action.
 
 ## 🛠️ Technical Details
 
@@ -67,6 +85,13 @@ npm run dev
 npm run build
 ```
 
+
+
+
+## 🤝 Contributing
+
+We welcome contributions! Open issues, propose features, or submit PRs. Please keep the code style consistent and ensure the UI remains responsive and privacy-first. Note that this is the source code for the ConfMap tool - please respect the intended usage patterns.
+
 ## 📱 Usage Examples
 
 ### Kubernetes Configurations
@@ -78,6 +103,7 @@ Great for understanding application configuration hierarchies and relationships.
 ### Infrastructure as Code
 Ideal for Terraform, CloudFormation, and other IaC configurations.
 
+
 ## 🎯 Use Cases
 
 - **Configuration Analysis**: Understand complex nested configurations
@@ -86,13 +112,20 @@ Ideal for Terraform, CloudFormation, and other IaC configurations.
 - **Troubleshooting**: Visualize configuration relationships and dependencies
 - **Planning**: Plan configuration changes with visual context
 
-## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the [Apache License 2.0](LICENSE).
+
+**Apache 2.0 License Benefits:**
+- ✅ **Free to use** - Personal, commercial, and enterprise use
+- ✅ **Modify freely** - Adapt and customize as needed
+- ✅ **Distribute** - Share with others
+- ✅ **Patent protection** - Includes patent grant
+- ✅ **Simple compliance** - Just keep copyright notice and license
+
+This permissive license ensures maximum adoption while protecting contributors and users.
 
 ---
 
