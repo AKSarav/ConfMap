@@ -35,9 +35,6 @@ Upload your YAML, JSON, or YML files and instantly see them transformed into bea
 3. Run `npm run dev` for development
 4. Open `map.html` in your browser
 
-## 📁 Sample Files
-
-**Try it now at [https://confmap.com](https://confmap.com)** with your own configuration files to see the intelligent 13-level color coding in action.
 
 ## 🛠️ Technical Details
 
