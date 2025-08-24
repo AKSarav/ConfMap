@@ -155,6 +155,53 @@
     opacity: 0.8;
   }
 
+  /* Idle State Message Styling */
+  #idle-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgb(107 114 128);
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  #idle-message .mb-4 {
+    margin-bottom: 1rem;
+  }
+
+  #idle-message svg {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto;
+    color: rgb(209 213 219);
+  }
+
+  #idle-message h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: rgb(75 85 99);
+    margin-bottom: 0.5rem;
+  }
+
+  #idle-message p {
+    color: rgb(107 114 128);
+    max-width: 28rem;
+    margin: 0 auto;
+  }
+
+  #idle-message.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   /* Idle-state grid background for the mind map container - matches ECharts createGridPattern */
   .grid-bg {
     /* ECharts grid background fill */

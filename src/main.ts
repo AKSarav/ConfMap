@@ -74,7 +74,7 @@ const searchButton = document.getElementById('search-button') as HTMLButtonEleme
 const layoutDropdown = document.getElementById('layout-dropdown') as HTMLSelectElement;
 const contextMenu = document.getElementById('context-menu') as HTMLDivElement;
 const focusNodeButton = document.getElementById('focus-node-button') as HTMLLIElement;
-const displayDropdown = document.getElementById('display-dropdown') as HTMLSelectElement;
+const displayDropdown = document.getElementById('display-dropdown') as HTMLSelectElement | null;
 
 
 const myChart = echarts.init(mindmapContainer);
@@ -429,7 +429,7 @@ function handleLayoutChange(layout: 'LR' | 'TB' | 'radial') {
 }
 
 function handleDisplayOptionChange() {
-    const displayMode = displayDropdown.value;
+    const displayMode = displayDropdown?.value;
     
     switch (displayMode) {
         case 'default':
@@ -504,8 +504,8 @@ searchInput.addEventListener('keypress', (e) => {
 layoutDropdown.addEventListener('change', (e) => handleLayoutChange((e.target as HTMLSelectElement).value as 'LR' | 'TB' | 'radial'));
 focusNodeButton.addEventListener('click', handleFocus);
 
-// Display options event listener
-displayDropdown.addEventListener('change', handleDisplayOptionChange);
+// Display options event listener (if present)
+displayDropdown?.addEventListener('change', handleDisplayOptionChange);
 
 
 window.addEventListener('click', () => {
@@ -526,8 +526,10 @@ myChart.on('contextmenu', (params) => {
 // Initialize layout dropdown
 updateLayoutDropdown();
 
-// Initialize display dropdown to default
-displayDropdown.value = 'default';
+// Initialize display dropdown to default (if present)
+if (displayDropdown) {
+  displayDropdown.value = 'default';
+}
 
 // Initialize chart with grid background for better UX in idle state
 initializeEmptyChart();
