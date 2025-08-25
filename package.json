@@ -18,7 +18,8 @@
     "tailwindcss": "^3.4.17",
     "terser": "^5.43.1",
     "typescript": "~5.8.3",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "wrangler": "^4.32.0"
   },
   "dependencies": {
     "echarts": "^6.0.0",

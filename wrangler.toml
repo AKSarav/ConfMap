@@ -1,0 +1,14 @@
+name = "confmap-reverse-proxy"
+main = "cloudflare-worker.js"
+compatibility_date = "2024-01-01"
+
+[env.production]
+name = "confmap-reverse-proxy"
+
+[[env.production.routes]]
+pattern = "confmap.com/*"
+zone_name = "confmap.com"
+
+[[env.production.routes]]
+pattern = "www.confmap.com/*"
+zone_name = "confmap.com"
