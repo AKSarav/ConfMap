@@ -85,21 +85,6 @@ Ideal for Terraform, CloudFormation, and other IaC configurations.
 - **Troubleshooting**: Visualize configuration relationships and dependencies
 - **Planning**: Plan configuration changes with visual context
 
-
-
-## 📄 License
-
-This project is open source and available under the [Apache License 2.0](LICENSE).
-
-**Apache 2.0 License Benefits:**
-- ✅ **Free to use** - Personal, commercial, and enterprise use
-- ✅ **Modify freely** - Adapt and customize as needed
-- ✅ **Distribute** - Share with others
-- ✅ **Patent protection** - Includes patent grant
-- ✅ **Simple compliance** - Just keep copyright notice and license
-
-This permissive license ensures maximum adoption while protecting contributors and users.
-
 ---
 
 **Developed with ❤️ From India**
