@@ -6,6 +6,8 @@
 
 An open-source library for mind map visualization of YAML, JSON, and YML configuration files, featuring an intelligent 13-level color-coding system.
 
+[![Watch the Demo](confmap-demo.png)](https://youtu.be/kYD43daiwp4)
+
 ## 🚀 Try ConfMap Now
 **Visit [https://confmap.com](https://confmap.com) to use the interactive visualizer**
 
