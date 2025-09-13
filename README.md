@@ -6,6 +6,8 @@
 
 An open-source library for mind map visualization of YAML, JSON, and YML configuration files, featuring an intelligent 13-level color-coding system.
 
+[![Watch the Demo](confmap-demo.png)](https://youtu.be/kYD43daiwp4)
+
 ## 🚀 Try ConfMap Now
 **Visit [https://confmap.com](https://confmap.com) to use the interactive visualizer**
 
@@ -87,21 +89,6 @@ Ideal for Terraform, CloudFormation, and other IaC configurations.
 - **Onboarding**: Help new team members understand system structures
 - **Troubleshooting**: Visualize configuration relationships and dependencies
 - **Planning**: Plan configuration changes with visual context
-
-
-
-## 📄 License
-
-This project is open source and available under the [Apache License 2.0](LICENSE).
-
-**Apache 2.0 License Benefits:**
-- ✅ **Free to use** - Personal, commercial, and enterprise use
-- ✅ **Modify freely** - Adapt and customize as needed
-- ✅ **Distribute** - Share with others
-- ✅ **Patent protection** - Includes patent grant
-- ✅ **Simple compliance** - Just keep copyright notice and license
-
-This permissive license ensures maximum adoption while protecting contributors and users.
 
 ---
 
