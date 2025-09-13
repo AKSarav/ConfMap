@@ -15,11 +15,14 @@ Upload your YAML, JSON, or YML files and instantly see them transformed into bea
 
 - **🎨 Intelligent Color Coding**: 13 distinct colors for different hierarchy levels
 - **📁 Multi-format Support**: YAML, JSON, and YML files
-- **🔍 Interactive Search**: Find and highlight specific nodes
+- **🔍 Enhanced Search**: Find and highlight ALL matching nodes with F3/Shift+F3 navigation
 - **🎯 Multiple Layouts**: Horizontal, Vertical, and Radial views
 - **📱 Responsive Design**: Works on all device sizes
 - **🎯 Node Focus**: Right-click to focus on specific nodes
 - **📊 Visual Hierarchy**: Clear column-based organization
+- **🧹 TidyUp Mode**: Alt+T to show only the lineage of a selected node (path from root + all descendants)
+- **📋 Copy Lineage**: Ctrl+C to copy the lineage tree of a selected node to clipboard in multiple formats
+- **📂 Toggle Expand/Collapse**: Alt+E or button click to toggle between expanding all nodes and collapsing all nodes
 
 
 ## 🚀 Getting Started

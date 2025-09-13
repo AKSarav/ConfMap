@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: production
+  labels:
+    app: web-service
+    environment: prod
+    team: backend
+  annotations:
+    version: "1.2.3"
+    last-updated: "2024-01-15"
+data:
+  app.properties: |
+    server.port=8080
+    server.host=0.0.0.0
+    logging.level=INFO
+  database:
+    host: db.example.com
+    port: 5432
+    name: app_db
+    credentials:
+      username: app_user
+      password_ref: secret://db-password
+    connection_pool:
+      min_size: 5
+      max_size: 20
+      timeout: 30s
+  redis:
+    cluster:
+      nodes:
+        - redis-1.example.com:6379
+        - redis-2.example.com:6379
+        - redis-3.example.com:6379
+      auth:
+        password_ref: secret://redis-password
+    settings:
+      max_connections: 100
+      timeout: 5s
+  services:
+    auth_service:
+      url: https://auth.example.com
+      timeout: 10s
+      retry_attempts: 3
+    payment_service:
+      url: https://payments.example.com
+      timeout: 15s
+      retry_attempts: 2
+      features:
+        stripe_enabled: true
+        paypal_enabled: false
+    notification_service:
+      url: https://notifications.example.com
+      channels:
+        email:
+          provider: sendgrid
+          api_key_ref: secret://sendgrid-key
+        sms:
+          provider: twilio
+          account_sid_ref: secret://twilio-sid
+          auth_token_ref: secret://twilio-token
+        push:
+          provider: firebase
+          project_id: my-app-project
+          credentials_ref: secret://firebase-creds
+  monitoring:
+    metrics:
+      enabled: true
+      endpoint: /metrics
+      port: 9090
+    logging:
+      level: INFO
+      format: json
+      destinations:
+        - console
+        - file:/var/log/app.log
+        - elasticsearch://logs.example.com:9200
+    tracing:
+      enabled: true
+      jaeger:
+        endpoint: jaeger.example.com:14268
+        service_name: web-service
+        sampling_rate: 0.1

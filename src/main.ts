@@ -86,6 +86,13 @@ let currentLayout: 'LR' | 'TB' | 'radial' = 'LR';
 let focusedNode: EChartsTreeData | null = null;
 let lineShadowsEnabled = true;
 let smoothCurvesEnabled = true; // Smooth curves by default
+let currentHoveredNode: EChartsTreeData | null = null;
+let lastSelectedNode: EChartsTreeData | null = null;
+let isTidyUpMode = false;
+let tidyUpTreeData: EChartsTreeData | null = null;
+let isAllExpanded = false; // Track expand/collapse state
+let currentSearchResults: string[] = []; // Store current search matches
+let currentSearchIndex = 0; // Track which result we're focusing on
 
 /**
  * Recursively transforms data, applying clustering logic for dense nodes.
@@ -116,6 +123,11 @@ function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
   }
 
   node.isParent = childrenData.length > 0;
+  
+  // Set default collapsed state: show only first 2-3 levels expanded
+  if (node.isParent && depth >= 2) {
+    node.collapsed = true;
+  }
 
   const hasGrandchildren = childrenData.some(child => typeof child.value === 'object' && child.value !== null && Object.keys(child.value).length > 0);
   if (childrenData.length > CLUSTER_THRESHOLD && hasGrandchildren) {
@@ -128,6 +140,7 @@ function toEChartsTree(data: any, name = 'root', depth = 0): EChartsTreeData {
         name: clusterName,
         depth: depth + 1,
         isParent: true,
+        collapsed: depth + 1 >= 2, // Apply same collapsed logic to cluster nodes
         itemStyle: { color: 'transparent', borderColor: 'transparent', borderWidth: 0 },
         label: { backgroundColor: getColumnColor(depth + 1), borderColor: 'transparent', borderWidth: 0 },
         children: chunk.map(child => toEChartsTree(child.value, child.key, depth + 2)),
@@ -259,20 +272,31 @@ function renderChart(data: EChartsTreeData) {
       },
 
     },
-    series: [
-      {
-        type: 'tree',
-        data: [data],
-        layout: isRadial ? 'radial' : 'orthogonal',
-        orient: isRadial ? undefined : (currentLayout === 'radial' ? undefined : currentLayout),
-        top: isRadial ? '15%' : '2%',
-        left: isRadial ? '15%' : '10%',
-        bottom: isRadial ? '15%' : '2%',
-        right: isRadial ? '15%' : '20%',
-        roam: true,
-        zlevel: 2,
-        symbol: 'none',
-        symbolSize: 0,
+        series: [
+          {
+            type: 'tree',
+            data: [data],
+            layout: isRadial ? 'radial' : 'orthogonal',
+            orient: isRadial ? undefined : (currentLayout === 'radial' ? undefined : currentLayout),
+            top: isRadial ? '10%' : '5%',
+            left: isRadial ? '10%' : '5%',
+            bottom: isRadial ? '10%' : '5%',
+            right: isRadial ? '10%' : '15%',
+            roam: true,
+            zlevel: 2,
+            symbol: 'none',
+            symbolSize: 0,
+            // Add spacing between nodes for better readability
+            nodeGap: isRadial ? 30 : 50, // Horizontal gap between nodes at same level
+            layerGap: isRadial ? 60 : 100, // Vertical gap between different levels/layers
+            // Additional spacing configuration
+            initialTreeDepth: -1, // Show all levels by default
+            leaves: {
+              label: {
+                position: isRadial ? 'inside' : (currentLayout === 'TB' ? 'bottom' : 'right'),
+                padding: [8, 16], // Smaller padding for leaf nodes
+              }
+            },
         itemStyle: {
           borderColor: 'transparent',
           borderWidth: 0,
@@ -282,11 +306,13 @@ function renderChart(data: EChartsTreeData) {
           position: isRadial ? 'inside' : (currentLayout === 'TB' ? 'top' : 'right'),
           verticalAlign: 'middle',
           align: isRadial ? 'center' : (currentLayout === 'TB' ? 'center' : 'left'),
-          padding: [8, 15],
+          padding: [12, 20], // Increased padding: [top/bottom, left/right]
           borderRadius: 8,
           backgroundColor: 'inherit',
           borderColor: 'transparent',
           borderWidth: 0,
+          // Add margin between labels
+          distance: 8, // Distance from the connection line
           formatter: (params: any) => {
             const { name, isParent, collapsed } = params.data;
             if (isParent) {
@@ -299,16 +325,19 @@ function renderChart(data: EChartsTreeData) {
             marker: {
               backgroundColor: 'rgba(0,0,0,0.05)',
               color: '#555',
-              width: 20,
-              height: 20,
-              lineHeight: 20,
+              width: 22,
+              height: 22,
+              lineHeight: 22,
               align: 'center',
               borderRadius: 4,
               fontWeight: 'bold',
+              padding: [2, 4], // Add padding inside marker
             },
             name: {
               color: '#333',
               fontSize: 14,
+              padding: [0, 8], // Add padding around text
+              lineHeight: 22, // Match marker height for alignment
             }
           }
         },
@@ -377,6 +406,9 @@ fileUpload.addEventListener('change', (event) => {
 
       originalTreeData = toEChartsTree(data);
       renderChart(originalTreeData);
+      
+      // Initialize button state based on actual tree state
+      updateExpandCollapseButton();
 
     } catch (error) {
       mindmapContainer.innerHTML = `<p>Error parsing file: ${(error as Error).message}</p>`;
@@ -390,38 +422,118 @@ function handleSearch() {
 
   const searchTerm = searchInput.value.toLowerCase().trim();
   if (!searchTerm) {
+    // Clear search results
+    currentSearchResults = [];
+    currentSearchIndex = 0;
+    updateSearchNavigationButtons();
+    
+    // Exit TidyUp mode when clearing search
+    if (isTidyUpMode) {
+      isTidyUpMode = false;
+      tidyUpTreeData = null;
+      const tidyUpIndicator = document.getElementById('tidyup-indicator');
+      if (tidyUpIndicator) tidyUpIndicator.classList.add('hidden');
+    }
     renderChart(originalTreeData);
+    showTidyUpNotification('Search cleared');
     return;
   }
 
-  const searchedData = JSON.parse(JSON.stringify(originalTreeData));
-  let found = false;
+  // Use the current displayed data (either original or TidyUp) as base for search
+  const baseData = isTidyUpMode && tidyUpTreeData ? tidyUpTreeData : originalTreeData;
+  const searchedData = JSON.parse(JSON.stringify(baseData));
+  let matchCount = 0;
+  const matchedNodes: string[] = [];
 
   function traverse(node: EChartsTreeData): boolean {
     const isMatch = node.name.toLowerCase().includes(searchTerm);
+    let hasMatchInSubtree = false;
+    
+    // Reset highlighting first
     node.label.borderColor = 'transparent';
     node.label.borderWidth = 0;
+    
+    // Check if this node matches
     if (isMatch) {
       node.label.borderColor = HIGHLIGHT_COLOR;
       node.label.borderWidth = 2;
-      found = true;
+      matchCount++;
+      matchedNodes.push(node.name);
+      hasMatchInSubtree = true;
     }
+    
+    // Check all children (not just until first match)
     if (node.children) {
-      let childFound = node.children.some(child => traverse(child));
-      if (childFound) {
+      let anyChildMatches = false;
+      node.children.forEach(child => {
+        if (traverse(child)) {
+          anyChildMatches = true;
+        }
+      });
+      
+      if (anyChildMatches) {
+        hasMatchInSubtree = true;
+        // Expand parent nodes that contain matches
         node.collapsed = false;
-        return true;
       }
     }
-    return isMatch;
+    
+    return hasMatchInSubtree;
   }
 
   traverse(searchedData);
 
-  if (found) {
+  if (matchCount > 0) {
     renderChart(searchedData);
+    
+    // Store search results for navigation
+    currentSearchResults = matchedNodes;
+    currentSearchIndex = 0;
+    
+    // Show navigation buttons if multiple results
+    updateSearchNavigationButtons();
+    
+    // Show search results feedback with navigation hint
+    const searchFeedback = matchCount === 1 
+      ? `Found 1 match: "${matchedNodes[0]}"`
+      : `Found ${matchCount} matches: ${matchedNodes.slice(0, 3).join(', ')}${matchCount > 3 ? ` and ${matchCount - 3} more...` : ''}${matchCount > 1 ? ' (Use ↑↓ arrows to navigate)' : ''}`;
+    
+    showTidyUpNotification(searchFeedback);
+    
+    // Update search button to show results count
+    const searchBtn = document.getElementById('search-button');
+    if (searchBtn) {
+      const originalText = searchBtn.innerHTML;
+      searchBtn.innerHTML = `<span class="text-xs">${matchCount} found</span>`;
+      searchBtn.style.backgroundColor = '#10b981'; // Green color
+      
+      // Reset button after 3 seconds
+      setTimeout(() => {
+        searchBtn.innerHTML = originalText;
+        searchBtn.style.backgroundColor = '';
+      }, 3000);
+    }
+    
   } else {
-    alert('No matching nodes found.');
+    // Clear search results
+    currentSearchResults = [];
+    currentSearchIndex = 0;
+    updateSearchNavigationButtons();
+    showTidyUpNotification('No matching nodes found.');
+    
+    // Update search button to show no results
+    const searchBtn = document.getElementById('search-button');
+    if (searchBtn) {
+      const originalText = searchBtn.innerHTML;
+      searchBtn.innerHTML = '<span class="text-xs">No matches</span>';
+      searchBtn.style.backgroundColor = '#ef4444'; // Red color
+      
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        searchBtn.innerHTML = originalText;
+        searchBtn.style.backgroundColor = '';
+      }, 2000);
+    }
   }
 }
 
@@ -434,7 +546,10 @@ function handleLayoutChange(layout: 'LR' | 'TB' | 'radial') {
     currentLayout = layout;
     updateLayoutDropdown();
     myChart.clear();
-    renderChart(originalTreeData);
+    
+    // Render the appropriate data (TidyUp or original)
+    const dataToRender = isTidyUpMode && tidyUpTreeData ? tidyUpTreeData : originalTreeData;
+    renderChart(dataToRender);
 }
 
 function handleDisplayOptionChange() {
@@ -502,57 +617,634 @@ function handleFocus() {
 }
 
 /**
- * Downloads the current mind map as a PNG image
+ * Creates a lineage tree showing only the path from root to target node and all its descendants
+ */
+function createLineageTree(originalData: EChartsTreeData, targetNode: EChartsTreeData): EChartsTreeData {
+  console.log('Creating lineage tree for target:', targetNode.name, 'at depth:', targetNode.depth);
+  
+  // Deep clone the original data
+  const lineageTree = JSON.parse(JSON.stringify(originalData));
+  
+  // Find the path from root to target node
+  const pathToTarget: string[] = [];
+  
+  function findPath(node: EChartsTreeData, target: EChartsTreeData, currentPath: string[]): boolean {
+    currentPath.push(node.name);
+    
+    if (node.name === target.name && node.depth === target.depth) {
+      pathToTarget.push(...currentPath);
+      return true;
+    }
+    
+    if (node.children) {
+      for (const child of node.children) {
+        if (findPath(child, target, currentPath)) {
+          return true;
+        }
+      }
+    }
+    
+    currentPath.pop();
+    return false;
+  }
+  
+  findPath(originalData, targetNode, []);
+  console.log('Path to target:', pathToTarget);
+  
+  // Filter the tree to show only lineage
+  function filterLineage(node: EChartsTreeData, currentPath: string[], targetDepth: number): EChartsTreeData | null {
+    const nodePathIndex = currentPath.indexOf(node.name);
+    const isOnPath = nodePathIndex !== -1;
+    const isAtOrBeyondTarget = node.depth >= targetDepth;
+    
+    console.log(`Filtering node: ${node.name}, depth: ${node.depth}, isOnPath: ${isOnPath}, isAtOrBeyondTarget: ${isAtOrBeyondTarget}`);
+    
+    if (!isOnPath && !isAtOrBeyondTarget) {
+      console.log(`  Excluding node: ${node.name}`);
+      return null; // Node is not on the path and not at/beyond target depth
+    }
+    
+    const filteredNode = { ...node };
+    
+    if (node.children && node.children.length > 0) {
+      const filteredChildren: EChartsTreeData[] = [];
+      
+      for (const child of node.children) {
+        // If we're at the target depth, include all children
+        if (node.depth === targetDepth) {
+          console.log(`  Including all children of target node: ${child.name}`);
+          filteredChildren.push(child);
+        } else {
+          // Otherwise, only include children on the path
+          const filteredChild = filterLineage(child, currentPath, targetDepth);
+          if (filteredChild) {
+            filteredChildren.push(filteredChild);
+          }
+        }
+      }
+      
+      filteredNode.children = filteredChildren.length > 0 ? filteredChildren : undefined;
+      console.log(`  Node ${node.name} has ${filteredChildren.length} filtered children`);
+    }
+    
+    return filteredNode;
+  }
+  
+  const result = filterLineage(lineageTree, pathToTarget, targetNode.depth);
+  console.log('Final lineage tree:', result);
+  return result || lineageTree;
+}
+
+/**
+ * Handles the TidyUp feature - shows only lineage of the currently hovered/selected node
+ */
+function handleTidyUp() {
+  console.log('handleTidyUp called, originalTreeData:', !!originalTreeData, 'currentHoveredNode:', currentHoveredNode?.name, 'lastSelectedNode:', lastSelectedNode?.name);
+  
+  if (!originalTreeData) {
+    showTidyUpNotification('Please upload a configuration file first');
+    return;
+  }
+
+  // Use currentHoveredNode first, then fall back to lastSelectedNode
+  const targetNode = currentHoveredNode || lastSelectedNode;
+  
+  if (!targetNode) {
+    // Show notification that no node is selected
+    showTidyUpNotification('Please hover over or click a node first, then press Alt+T');
+    return;
+  }
+  
+  if (isTidyUpMode) {
+    // Exit TidyUp mode - restore original tree
+    console.log('Exiting TidyUp mode');
+    isTidyUpMode = false;
+    tidyUpTreeData = null;
+    renderChart(originalTreeData);
+    showTidyUpNotification('TidyUp mode disabled - showing full tree');
+  } else {
+    // Enter TidyUp mode - show only lineage
+    console.log('Entering TidyUp mode for node:', targetNode.name);
+    isTidyUpMode = true;
+    tidyUpTreeData = createLineageTree(originalTreeData, targetNode);
+    console.log('Created lineage tree:', tidyUpTreeData);
+    renderChart(tidyUpTreeData);
+    showTidyUpNotification(`TidyUp mode enabled - showing lineage of "${targetNode.name}"`);
+  }
+}
+
+
+/**
+ * Copies the lineage (path from root + all descendants) of a node to clipboard
+ */
+function copyLineageToClipboard(targetNode: EChartsTreeData) {
+  if (!originalTreeData) return;
+  
+  console.log('Copying lineage for:', targetNode.name);
+  
+  // Get the lineage tree
+  const lineageTree = createLineageTree(originalTreeData, targetNode);
+  
+  // Convert tree to readable text format
+  function treeToText(node: EChartsTreeData, indent: string = '', isLast: boolean = true): string {
+    const connector = isLast ? '└── ' : '├── ';
+    const nodeText = `${indent}${connector}${node.name}\n`;
+    
+    if (node.children && node.children.length > 0) {
+      const childIndent = indent + (isLast ? '    ' : '│   ');
+      const childTexts = node.children.map((child, index) => 
+        treeToText(child, childIndent, index === node.children!.length - 1)
+      );
+      return nodeText + childTexts.join('');
+    }
+    
+    return nodeText;
+  }
+  
+  // Convert to YAML-like format (alternative)
+  function treeToYamlLike(node: EChartsTreeData, indent: string = ''): string {
+    let result = `${indent}${node.name}:\n`;
+    
+    if (node.children && node.children.length > 0) {
+      const childIndent = indent + '  ';
+      const childTexts = node.children.map(child => 
+        treeToYamlLike(child, childIndent)
+      );
+      result += childTexts.join('');
+    } else {
+      // If it's a leaf node, show it as a value
+      result = `${indent}${node.name}\n`;
+    }
+    
+    return result;
+  }
+  
+  // Generate both formats
+  const treeFormat = `Lineage Tree for "${targetNode.name}":\n\n${treeToText(lineageTree)}`;
+  const yamlFormat = `\nYAML-like format:\n\n${treeToYamlLike(lineageTree)}`;
+  
+  const fullText = treeFormat + yamlFormat;
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(fullText).then(() => {
+    showTidyUpNotification(`Copied lineage of "${targetNode.name}" to clipboard!`);
+    console.log('Lineage copied to clipboard:', fullText);
+  }).catch(err => {
+    console.error('Failed to copy to clipboard:', err);
+    showTidyUpNotification('Failed to copy to clipboard - check console for details');
+  });
+}
+
+/**
+ * Shows a temporary notification for TidyUp actions and updates the indicator
+ */
+function showTidyUpNotification(message: string) {
+  // Update the TidyUp mode indicator
+  const tidyUpIndicator = document.getElementById('tidyup-indicator');
+  const tidyUpNodeName = document.getElementById('tidyup-node-name');
+  
+  if (isTidyUpMode && currentHoveredNode && tidyUpIndicator && tidyUpNodeName) {
+    tidyUpIndicator.classList.remove('hidden');
+    tidyUpNodeName.textContent = currentHoveredNode.name;
+  } else if (tidyUpIndicator) {
+    tidyUpIndicator.classList.add('hidden');
+  }
+  
+  // Create or update notification element
+  let notification = document.getElementById('tidyup-notification');
+  if (!notification) {
+    notification = document.createElement('div');
+    notification.id = 'tidyup-notification';
+    notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full';
+    document.body.appendChild(notification);
+  }
+  
+  notification.textContent = message;
+  notification.style.transform = 'translateX(0)';
+  
+  // Hide after 3 seconds
+  setTimeout(() => {
+    if (notification) {
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        if (notification && notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 300);
+    }
+  }, 3000);
+}
+
+/**
+ * Expands all nodes in the tree (removes all collapsed states)
+ */
+function expandAllNodes() {
+    if (!originalTreeData) {
+        showTidyUpNotification('Please upload a configuration file first');
+        return;
+    }
+    
+    // Function to recursively expand all nodes
+    function expandRecursively(node: EChartsTreeData) {
+        if (node.isParent) {
+            node.collapsed = false;
+        }
+        if (node.children) {
+            node.children.forEach(child => expandRecursively(child));
+        }
+    }
+    
+    // Expand all nodes in the original tree data
+    expandRecursively(originalTreeData);
+    
+    // If we're in TidyUp mode, also expand the TidyUp tree
+    if (isTidyUpMode && tidyUpTreeData) {
+        expandRecursively(tidyUpTreeData);
+        renderChart(tidyUpTreeData);
+    } else {
+        renderChart(originalTreeData);
+    }
+    
+    // Update state and button
+    isAllExpanded = true;
+    updateExpandCollapseButton();
+    showTidyUpNotification('All nodes expanded!');
+}
+
+/**
+ * Collapses all nodes in the tree (sets all parent nodes as collapsed)
+ */
+function collapseAllNodes() {
+    if (!originalTreeData) {
+        showTidyUpNotification('Please upload a configuration file first');
+        return;
+    }
+    
+    // Function to recursively collapse all nodes
+    function collapseRecursively(node: EChartsTreeData) {
+        if (node.isParent) {
+            node.collapsed = true;
+        }
+        if (node.children) {
+            node.children.forEach(child => collapseRecursively(child));
+        }
+    }
+    
+    // Collapse all nodes in the original tree data
+    collapseRecursively(originalTreeData);
+    
+    // If we're in TidyUp mode, also collapse the TidyUp tree
+    if (isTidyUpMode && tidyUpTreeData) {
+        collapseRecursively(tidyUpTreeData);
+        renderChart(tidyUpTreeData);
+    } else {
+        renderChart(originalTreeData);
+    }
+    
+    // Update state and button
+    isAllExpanded = false;
+    updateExpandCollapseButton();
+    showTidyUpNotification('All nodes collapsed!');
+}
+
+/**
+ * Toggles between expand all and collapse all
+ */
+function toggleExpandCollapseAll() {
+    if (isAllExpanded) {
+        collapseAllNodes();
+    } else {
+        expandAllNodes();
+    }
+}
+
+/**
+ * Checks if all expandable nodes in the tree are currently expanded
+ */
+function checkIfAllExpanded(node: EChartsTreeData): boolean {
+    if (node.isParent && node.collapsed) {
+        return false; // Found a collapsed parent node
+    }
+    if (node.children) {
+        return node.children.every(child => checkIfAllExpanded(child));
+    }
+    return true; // No collapsed nodes found
+}
+
+/**
+ * Updates the search navigation buttons visibility and state
+ */
+function updateSearchNavigationButtons() {
+    const navButtons = document.getElementById('search-nav-buttons');
+    const prevBtn = document.getElementById('search-prev-btn');
+    const nextBtn = document.getElementById('search-next-btn');
+    
+    if (!navButtons || !prevBtn || !nextBtn) return;
+    
+    if (currentSearchResults.length > 1) {
+        navButtons.classList.remove('hidden');
+        navButtons.classList.add('flex');
+        
+        // Update button states (could disable if only one result, but we'll keep them enabled for cycling)
+        prevBtn.removeAttribute('disabled');
+        nextBtn.removeAttribute('disabled');
+    } else {
+        navButtons.classList.add('hidden');
+        navButtons.classList.remove('flex');
+    }
+}
+
+/**
+ * Finds a node in the tree by name and depth for focusing
+ */
+function findNodeInTree(tree: EChartsTreeData, targetName: string): EChartsTreeData | null {
+    if (tree.name === targetName) {
+        return tree;
+    }
+    
+    if (tree.children) {
+        for (const child of tree.children) {
+            const found = findNodeInTree(child, targetName);
+            if (found) return found;
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Focuses on a specific node by highlighting it and centering the view
+ */
+function focusOnSearchResult(nodeName: string) {
+    if (!originalTreeData) return;
+    
+    // Find the node in the current tree data
+    const currentData = isTidyUpMode && tidyUpTreeData ? tidyUpTreeData : originalTreeData;
+    const targetNode = findNodeInTree(currentData, nodeName);
+    
+    if (targetNode) {
+        // Create a temporary enhanced highlight for the focused node
+        const tempTreeData = JSON.parse(JSON.stringify(currentData));
+        
+        function highlightFocusedNode(node: EChartsTreeData): void {
+            if (node.name === nodeName) {
+                // Enhanced highlighting for the focused node with pulse effect
+                node.label.borderColor = '#3b82f6'; // Blue color for focus
+                node.label.borderWidth = 4;
+                node.label.backgroundColor = '#dbeafe'; // Light blue background
+                
+                // Add emphasis styling for the focused node
+                node.itemStyle = {
+                    ...node.itemStyle,
+                    color: '#3b82f6',
+                    borderColor: '#1d4ed8',
+                    borderWidth: 2
+                };
+            } else if (node.label.borderColor === HIGHLIGHT_COLOR) {
+                // Keep search highlights but make them less prominent when another node is focused
+                node.label.borderColor = '#ef4444'; // Keep red but slightly muted
+                node.label.borderWidth = 1;
+            }
+            
+            if (node.children) {
+                node.children.forEach(child => highlightFocusedNode(child));
+            }
+        }
+        
+        highlightFocusedNode(tempTreeData);
+        
+        // Render with the enhanced highlighting
+        renderChart(tempTreeData);
+        
+        // Try to focus and center on the node
+        try {
+            // First, expand parent nodes to ensure the target is visible
+            function ensureNodeVisible(node: EChartsTreeData, targetName: string): boolean {
+                if (node.name === targetName) {
+                    return true;
+                }
+                
+                if (node.children) {
+                    for (const child of node.children) {
+                        if (ensureNodeVisible(child, targetName)) {
+                            // Expand this parent node to make child visible
+                            node.collapsed = false;
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
+            }
+            
+            ensureNodeVisible(tempTreeData, nodeName);
+            
+            // Re-render with expanded parents
+            renderChart(tempTreeData);
+            
+            // Try to highlight the specific node in ECharts
+            setTimeout(() => {
+                myChart.dispatchAction({
+                    type: 'highlight',
+                    name: nodeName
+                });
+                
+                // Attempt to center on the node (this may vary by ECharts version)
+                myChart.dispatchAction({
+                    type: 'focusNodeAdjacency',
+                    name: nodeName
+                });
+                
+            }, 200);
+            
+        } catch (error) {
+            console.log('Enhanced chart focus not available, using basic highlight:', error);
+        }
+        
+        // Show brief notification
+        showTidyUpNotification(`Focused on: "${nodeName}" (${currentSearchIndex + 1}/${currentSearchResults.length})`);
+        
+        // Create a subtle pulse effect
+        let pulseCount = 0;
+        const pulseInterval = setInterval(() => {
+            pulseCount++;
+            
+            if (pulseCount <= 3) {
+                // Create pulse by alternating border width
+                const pulseTreeData = JSON.parse(JSON.stringify(currentData));
+                function pulseNode(node: EChartsTreeData): void {
+                    if (node.name === nodeName) {
+                        const borderWidth = pulseCount % 2 === 0 ? 4 : 3;
+                        node.label.borderColor = '#3b82f6';
+                        node.label.borderWidth = borderWidth;
+                        node.label.backgroundColor = '#dbeafe';
+                    } else if (node.label.borderColor === HIGHLIGHT_COLOR) {
+                        node.label.borderColor = HIGHLIGHT_COLOR;
+                        node.label.borderWidth = 2;
+                    }
+                    
+                    if (node.children) {
+                        node.children.forEach(child => pulseNode(child));
+                    }
+                }
+                
+                pulseNode(pulseTreeData);
+                renderChart(pulseTreeData);
+            } else {
+                // Stop pulsing and return to normal search highlighting
+                clearInterval(pulseInterval);
+                if (currentSearchResults.length > 0) {
+                    renderChart(currentData);
+                }
+            }
+        }, 300); // Pulse every 300ms
+    }
+}
+
+/**
+ * Navigates to previous search result
+ */
+function navigateToPreviousResult() {
+    if (currentSearchResults.length === 0) return;
+    
+    currentSearchIndex = (currentSearchIndex - 1 + currentSearchResults.length) % currentSearchResults.length;
+    const currentMatch = currentSearchResults[currentSearchIndex];
+    
+    // Focus on the node instead of just showing notification
+    focusOnSearchResult(currentMatch);
+}
+
+/**
+ * Navigates to next search result
+ */
+function navigateToNextResult() {
+    if (currentSearchResults.length === 0) return;
+    
+    currentSearchIndex = (currentSearchIndex + 1) % currentSearchResults.length;
+    const currentMatch = currentSearchResults[currentSearchIndex];
+    
+    // Focus on the node instead of just showing notification
+    focusOnSearchResult(currentMatch);
+}
+
+/**
+ * Updates the expand/collapse button text and icon based on current tree state
+ */
+function updateExpandCollapseButton() {
+    const expandBtn = document.getElementById('expand-all-btn');
+    if (expandBtn && originalTreeData) {
+        // Check actual tree state instead of relying on flag
+        const actuallyAllExpanded = checkIfAllExpanded(originalTreeData);
+        isAllExpanded = actuallyAllExpanded;
+        
+        if (isAllExpanded) {
+            expandBtn.innerHTML = '<span class="emoji-icon">📁</span> Collapse All';
+        } else {
+            expandBtn.innerHTML = '<span class="emoji-icon">📂</span> Expand All';
+        }
+    }
+}
+
+/**
+ * Downloads the current mind map as a PNG image with full content capture
  */
 function downloadAsPNG() {
     if (!myChart) return;
     
     try {
-        // Get the chart as base64 data URL
-        const dataURL = myChart.getDataURL({
-            type: 'png',
-            pixelRatio: 2, // Higher quality
-            backgroundColor: '#ffffff'
-        });
-        
-        // Create a temporary link element
-        const link = document.createElement('a');
-        link.download = 'confmap-mindmap.png';
-        link.href = dataURL;
-        
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Show success feedback
+        // Show loading state
         const downloadBtn = document.getElementById('download-png-btn');
         if (downloadBtn) {
             const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<span class="emoji-icon">✅</span> Saved!';
-            downloadBtn.style.backgroundColor = '#10b981'; // Green color
-            
-            // Reset button after 2 seconds
-            setTimeout(() => {
-                downloadBtn.innerHTML = originalText;
-                downloadBtn.style.backgroundColor = '';
-            }, 2000);
+            downloadBtn.innerHTML = '<span class="emoji-icon">⏳</span> Exporting...';
+            downloadBtn.style.backgroundColor = '#f59e0b'; // Orange color
         }
+        
+        // First, expand all nodes to ensure everything is visible
+        if (originalTreeData) {
+            if (!isAllExpanded) {
+                expandAllNodes();
+            }
+        }
+        
+        // Wait for expansion to complete, then reset view to fit all content
+        setTimeout(() => {
+            try {
+                // Use ECharts' restore action to fit all content in view
+                myChart.dispatchAction({
+                    type: 'restore'
+                });
+                
+                // Wait for the restore action to complete
+                setTimeout(() => {
+                    try {
+                        // Now capture the full content with proper margins
+                        const dataURL = myChart.getDataURL({
+                            type: 'png',
+                            pixelRatio: 2, // Good quality without being too large
+                            backgroundColor: '#ffffff',
+                            excludeComponents: ['toolbox', 'legend'] // Exclude UI components for cleaner export
+                        });
+                        
+                        // Create a temporary link element
+                        const link = document.createElement('a');
+                        link.download = `confmap-mindmap-${new Date().toISOString().slice(0, 10)}.png`;
+                        link.href = dataURL;
+                        
+                        // Trigger download
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        // Show success feedback
+                        if (downloadBtn) {
+                            const originalText = downloadBtn.innerHTML;
+                            downloadBtn.innerHTML = '<span class="emoji-icon">✅</span> Saved!';
+                            downloadBtn.style.backgroundColor = '#10b981'; // Green color
+                            
+                            // Reset button after 2 seconds
+                            setTimeout(() => {
+                                downloadBtn.innerHTML = originalText;
+                                downloadBtn.style.backgroundColor = '';
+                            }, 2000);
+                        }
+                        
+                        // Show success notification
+                        showTidyUpNotification('Full mind map exported as PNG!');
+                        
+                    } catch (innerError) {
+                        console.error('Error in final PNG export:', innerError);
+                        showPNGError();
+                    }
+                }, 200); // Wait for restore to complete
+                
+            } catch (innerError) {
+                console.error('Error in restore action:', innerError);
+                showPNGError();
+            }
+        }, 300); // Wait for expansion to complete
+        
     } catch (error) {
         console.error('Error downloading PNG:', error);
-        // Show error feedback
-        const downloadBtn = document.getElementById('download-png-btn');
-        if (downloadBtn) {
-            const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<span class="emoji-icon">❌</span> Error';
-            downloadBtn.style.backgroundColor = '#ef4444'; // Red color
-            
-            // Reset button after 2 seconds
-            setTimeout(() => {
-                downloadBtn.innerHTML = originalText;
-                downloadBtn.style.backgroundColor = '';
-            }, 2000);
-        }
+        showPNGError();
+    }
+}
+
+/**
+ * Shows error feedback for PNG export
+ */
+function showPNGError() {
+    const downloadBtn = document.getElementById('download-png-btn');
+    if (downloadBtn) {
+        const originalText = downloadBtn.innerHTML;
+        downloadBtn.innerHTML = '<span class="emoji-icon">❌</span> Error';
+        downloadBtn.style.backgroundColor = '#ef4444'; // Red color
+        
+        // Reset button after 2 seconds
+        setTimeout(() => {
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.style.backgroundColor = '';
+        }, 2000);
     }
 }
 
@@ -568,6 +1260,24 @@ focusNodeButton.addEventListener('click', handleFocus);
 const downloadPngBtn = document.getElementById('download-png-btn');
 if (downloadPngBtn) {
     downloadPngBtn.addEventListener('click', downloadAsPNG);
+}
+
+// Expand/Collapse All button event listener
+const expandAllBtn = document.getElementById('expand-all-btn');
+if (expandAllBtn) {
+    expandAllBtn.addEventListener('click', toggleExpandCollapseAll);
+}
+
+// Search navigation button event listeners
+const searchPrevBtn = document.getElementById('search-prev-btn');
+const searchNextBtn = document.getElementById('search-next-btn');
+
+if (searchPrevBtn) {
+    searchPrevBtn.addEventListener('click', navigateToPreviousResult);
+}
+
+if (searchNextBtn) {
+    searchNextBtn.addEventListener('click', navigateToNextResult);
 }
 
 // Fullscreen functionality - simple header toggle
@@ -610,14 +1320,108 @@ window.addEventListener('click', () => {
     contextMenu.style.display = 'none';
 });
 
+// Enhanced event handling for TidyUp feature with extensive debugging
+console.log('Setting up ECharts event handlers...');
+
+myChart.on('mouseover', (params) => {
+    // Check if we have node data (tree series events have data property with node info)
+    if (params.data && params.data.name) {
+        currentHoveredNode = params.data as EChartsTreeData;
+        lastSelectedNode = params.data as EChartsTreeData; // Also update last selected
+        console.log('Hovered node:', currentHoveredNode.name);
+        // Update cursor to indicate interactivity
+        mindmapContainer.style.cursor = 'pointer';
+    }
+});
+
+myChart.on('mouseout', (params) => {
+    // Reset cursor
+    mindmapContainer.style.cursor = 'default';
+    // Keep the hovered node for a short time for TidyUp functionality
+    setTimeout(() => {
+        currentHoveredNode = null;
+    }, 200); // Small delay to allow Alt+T to work
+});
+
+// Also track clicks to ensure we have a selected node
+myChart.on('click', (params) => {
+    // Check if we have node data
+    if (params.data && params.data.name) {
+        lastSelectedNode = params.data as EChartsTreeData;
+        currentHoveredNode = params.data as EChartsTreeData;
+        console.log('Clicked node:', lastSelectedNode.name);
+    }
+});
+
+
 // Simplified context menu handling
 myChart.on('contextmenu', (params) => {
     if (params.dataType === 'node') {
         focusedNode = params.data as EChartsTreeData;
+        currentHoveredNode = params.data as EChartsTreeData; // Update for TidyUp
         // Simple positioning without complex event handling
         contextMenu.style.left = '50%';
         contextMenu.style.top = '50%';
         contextMenu.style.display = 'block';
+    }
+});
+
+// Test if JavaScript is working
+console.log('JavaScript loaded successfully!');
+
+// Test basic keyboard event detection
+document.addEventListener('keydown', (event) => {
+    console.log('Key pressed:', event.key, 'Alt:', event.altKey, 'Ctrl:', event.ctrlKey);
+
+    
+    // Alt+T to toggle TidyUp mode - use event.code for keyboard layout independence
+    if (event.altKey && (event.code === 'KeyT' || event.key.toLowerCase() === 't' || event.key === 'þ')) {
+        event.preventDefault();
+        const targetNode = currentHoveredNode || lastSelectedNode;
+        console.log('Alt+T pressed, targetNode:', targetNode?.name);
+        handleTidyUp();
+    }
+    
+    // Alt+E to toggle expand/collapse all nodes
+    if (event.altKey && (event.code === 'KeyE' || event.key.toLowerCase() === 'e')) {
+        event.preventDefault();
+        console.log('Alt+E pressed, toggling expand/collapse all nodes');
+        toggleExpandCollapseAll();
+    }
+    
+    // Ctrl+C to copy lineage of selected node to clipboard
+    if (event.ctrlKey && event.code === 'KeyC') {
+        const targetNode = currentHoveredNode || lastSelectedNode;
+        if (targetNode && originalTreeData) {
+            event.preventDefault();
+            console.log('Ctrl+C pressed, copying lineage for:', targetNode.name);
+            copyLineageToClipboard(targetNode);
+        }
+    }
+    
+    // Escape key to exit TidyUp mode
+    if (event.key === 'Escape' && isTidyUpMode) {
+        event.preventDefault();
+        handleTidyUp(); // This will toggle off TidyUp mode
+    }
+    
+    // Arrow keys to navigate through search results (when search input is focused or results exist)
+    if (currentSearchResults.length > 0 && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+        const activeElement = document.activeElement;
+        const isSearchFocused = activeElement === searchInput;
+        
+        // Only handle arrow keys if search input is focused or no other input is focused
+        if (isSearchFocused || (!activeElement || activeElement.tagName !== 'INPUT')) {
+            event.preventDefault();
+            
+            if (event.key === 'ArrowUp') {
+                // Up arrow: Previous result
+                navigateToPreviousResult();
+            } else {
+                // Down arrow: Next result
+                navigateToNextResult();
+            }
+        }
     }
 });
 
@@ -631,6 +1435,70 @@ if (displayDropdown) {
 
 // Initialize chart with grid background for better UX in idle state
 initializeEmptyChart();
+
+// Scrollable controls functionality
+function initializeScrollableControls() {
+    const controlsContainer = document.querySelector('.overflow-x-auto');
+    const leftFade = document.querySelector('.scroll-fade-left');
+    const rightFade = document.querySelector('.scroll-fade-right');
+    
+    if (!controlsContainer || !leftFade || !rightFade) return;
+    
+    function updateScrollIndicators() {
+        const { scrollLeft, scrollWidth, clientWidth } = controlsContainer as Element;
+        
+        // Show/hide left fade
+        if (scrollLeft > 10) {
+            leftFade.classList.remove('hidden');
+        } else {
+            leftFade.classList.add('hidden');
+        }
+        
+        // Show/hide right fade
+        if (scrollLeft < scrollWidth - clientWidth - 10) {
+            rightFade.classList.remove('hidden');
+        } else {
+            rightFade.classList.add('hidden');
+        }
+    }
+    
+    // Update indicators on scroll
+    controlsContainer.addEventListener('scroll', updateScrollIndicators);
+    
+    // Update indicators on resize
+    window.addEventListener('resize', updateScrollIndicators);
+    
+    // Initial update
+    setTimeout(updateScrollIndicators, 100);
+    
+    // Add smooth scroll to controls on mobile
+    if ('ontouchstart' in window) {
+        controlsContainer.addEventListener('touchstart', () => {
+            controlsContainer.classList.add('scroll-smooth');
+        });
+        
+        controlsContainer.addEventListener('touchend', () => {
+            setTimeout(() => {
+                controlsContainer.classList.remove('scroll-smooth');
+            }, 300);
+        });
+    }
+    
+    // Expose scroll to control function globally for future use
+    (window as any).scrollToControl = (controlId: string) => {
+        const control = document.getElementById(controlId);
+        if (control && controlsContainer) {
+            control.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest', 
+                inline: 'center' 
+            });
+        }
+    };
+}
+
+// Initialize scrollable controls
+initializeScrollableControls();
 
 window.addEventListener('resize', () => {
   myChart.resize();

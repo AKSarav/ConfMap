@@ -55,6 +55,76 @@
         transform: scale(1.05);
         transition: transform 0.2s ease;
       }
+      
+      /* Scrollable Controls Styles */
+      .controls-section {
+        position: relative;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        background: white;
+      }
+      
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      
+      /* Control items hover effects */
+      .flex-shrink-0:hover {
+        transform: translateY(-1px);
+        transition: transform 0.15s ease;
+      }
+      
+      /* Mobile-first responsive adjustments */
+      @media (max-width: 768px) {
+        .controls-section {
+          padding: 0.75rem 1rem;
+        }
+        
+        .gap-6 {
+          gap: 1rem;
+        }
+        
+        /* Touch-friendly scrolling indicators */
+        .scroll-fade-left,
+        .scroll-fade-right {
+          display: block !important;
+        }
+      }
+      
+      /* Smooth scroll behavior for control bar */
+      .overflow-x-auto {
+        scroll-padding: 1rem;
+      }
+      
+      /* Search navigation buttons */
+      .btn-nav {
+        padding: 0.25rem;
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        color: #6b7280;
+        transition: all 0.15s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .btn-nav:hover {
+        background: #e5e7eb;
+        color: #374151;
+        transform: translateY(-1px);
+      }
+      
+      .btn-nav:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
     </style>
     
   </head>
@@ -67,6 +137,7 @@
             <div class="text-left">
                 <h1 class="text-4xl font-bold text-gray-900 confmap-brand">Conf Map <span class="text-gray-500 font-bold text-blue-500">⊙</span> </h1>
                 <p class="text-gray-600 mt-1">Visualize your YAML and JSON files as an interactive Mind Map</p>
+                <p class="text-xs text-gray-500 mt-1">💡 Shortcuts: <kbd class="px-1 py-0.5 bg-gray-100 rounded text-xs">Alt+T</kbd> TidyUp, <kbd class="px-1 py-0.5 bg-gray-100 rounded text-xs">Alt+E</kbd> Toggle expand, <kbd class="px-1 py-0.5 bg-gray-100 rounded text-xs">↑↓</kbd> Navigate search results, <kbd class="px-1 py-0.5 bg-gray-100 rounded text-xs">Ctrl+C</kbd> Copy lineage</p>
             </div>
           </div>
           <div class="text-right">
@@ -83,28 +154,53 @@
 
       <!-- Main Content -->
       <main class="w-full">
-        <!-- Controls Section -->
+        <!-- Scrollable Controls Section -->
         <div class="controls-section">
-          <div class="flex items-center justify-start gap-8">
-            <!-- File Upload (custom-styled for consistent height) -->
-            <div class="flex items-center gap-2">
+          <!-- Mobile scroll hint -->
+          <div class="md:hidden text-xs text-gray-400 mb-2 text-center">
+            ← Swipe to see more controls →
+          </div>
+          
+          <div class="relative">
+            <div class="flex items-center overflow-x-auto scrollbar-hide gap-6 pb-2" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+              <!-- Scroll gradient indicators -->
+              <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 hidden scroll-fade-left"></div>
+              <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 hidden scroll-fade-right"></div>
+            <!-- File Upload Control -->
+            <div class="flex items-center gap-2 flex-shrink-0">
               <label for="file-upload" class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                <span class="emoji-icon">📁</span> Upload File
+                <span class="emoji-icon">📁</span> Upload
               </label>
               <input type="file" id="file-upload" accept=".yml,.yaml,.json" class="visually-hidden" />
               <button id="choose-file-btn" class="btn-primary-compact">Choose file</button>
-              <span id="selected-file-name" class="text-sm text-gray-500">No file chosen</span>
+              <span id="selected-file-name" class="text-sm text-gray-500 max-w-32 truncate">No file chosen</span>
             </div>
 
-            <!-- Search Box -->
-            <div class="flex items-center gap-2">
-              <input type="search" id="search-input" placeholder="Search nodes..." class="search-input-compact">
-              <button id="search-button" class="btn-primary-compact">Search</button>
+            <!-- Search Control -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <input type="search" id="search-input" placeholder="Search..." class="search-input-compact w-32 md:w-40">
+              <button id="search-button" class="btn-primary-compact">
+                <span class="hidden md:inline">Search</span>
+                <span class="md:hidden">🔍</span>
+              </button>
+              <!-- Search Navigation Buttons -->
+              <div id="search-nav-buttons" class="hidden items-center gap-1">
+                <button id="search-prev-btn" class="btn-nav" title="Previous result (↑)">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                  </svg>
+                </button>
+                <button id="search-next-btn" class="btn-nav" title="Next result (↓)">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
 
-            <!-- Layout Dropdown -->
-            <div class="flex items-center gap-2">
-              <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+            <!-- Layout Control -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <label class="text-sm font-medium text-gray-700 whitespace-nowrap hidden md:inline">
                 <span class="emoji-icon">🎨</span> Layout
               </label>
               <select id="layout-dropdown" class="dropdown-select">
@@ -114,23 +210,31 @@
               </select>
             </div>
 
-            <!-- Download PNG Button -->
-            <div class="flex items-center gap-2">
+            <!-- Export Control -->
+            <div class="flex items-center gap-2 flex-shrink-0">
               <button id="download-png-btn" class="btn-primary-compact">
-                <span class="text-sm">Export as PNG ↓</span>
+                <span class="hidden md:inline">Export PNG ↓</span>
+                <span class="md:hidden">📸</span>
               </button>
             </div>
 
-            <!-- Fullscreen Button -->
-            <div class="flex items-center gap-2">
+            <!-- Expand/Collapse Control -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button id="expand-all-btn" class="btn-primary-compact">
+                <span class="emoji-icon">📂</span> 
+                <span class="hidden md:inline">Expand All</span>
+              </button>
+            </div>
+
+            <!-- Fullscreen Control -->
+            <div class="flex items-center gap-2 flex-shrink-0">
               <button id="fullscreen-btn" class="btn-fullscreen">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
                 </svg>
-                <span class="fullscreen-text">Fullscreen</span>
+                <span class="fullscreen-text hidden md:inline">Fullscreen</span>
               </button>
             </div>
-
           </div>
         </div>
 
