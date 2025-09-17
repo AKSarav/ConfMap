@@ -25,6 +25,7 @@ Upload your YAML, JSON, or YML files and instantly see them transformed into bea
 - **🧹 TidyUp Mode**: Alt+T to show only the lineage of a selected node (path from root + all descendants)
 - **📋 Copy Lineage**: Ctrl+C to copy the lineage tree of a selected node to clipboard in multiple formats
 - **📂 Toggle Expand/Collapse**: Alt+E or button click to toggle between expanding all nodes and collapsing all nodes
+- **📝 Word Wrapping**: Alt+W to toggle word wrapping for lengthy node text, improving readability of long configuration keys
 
 
 ## 🚀 Getting Started
@@ -49,6 +50,18 @@ Upload your YAML, JSON, or YML files and instantly see them transformed into bea
 - Automatic color cycling for deeper levels
 - Interactive tooltips with level information
 - Legend showing all color levels
+- Smart text wrapping for improved readability
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Alt + T` | Toggle TidyUp Mode (show lineage of selected node) |
+| `Alt + E` | Toggle Expand/Collapse all nodes |
+| `Alt + W` | Toggle word wrapping for lengthy text |
+| `Ctrl + C` | Copy lineage of selected node to clipboard |
+| `↑ / ↓` | Navigate through search results |
+| `Escape` | Exit TidyUp mode |
 
 ## 🔧 Development
 
@@ -73,13 +86,13 @@ We welcome contributions! Open issues, propose features, or submit PRs. Please k
 ## 📱 Usage Examples
 
 ### Kubernetes Configurations
-Perfect for visualizing complex Kubernetes YAML files with multiple nested levels.
+Perfect for visualizing complex Kubernetes YAML files with multiple nested levels. Use Alt+W to enable word wrapping for long resource names and configuration keys.
 
 ### Application Configs
-Great for understanding application configuration hierarchies and relationships.
+Great for understanding application configuration hierarchies and relationships. Word wrapping helps with lengthy environment variable names and configuration paths.
 
 ### Infrastructure as Code
-Ideal for Terraform, CloudFormation, and other IaC configurations.
+Ideal for Terraform, CloudFormation, and other IaC configurations. The word wrap feature is especially useful for long resource identifiers and policy statements.
 
 
 ## 🎯 Use Cases

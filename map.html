@@ -125,6 +125,59 @@
         cursor: not-allowed;
         transform: none;
       }
+      
+      /* Help Panel Styles */
+      .help-panel-content::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      .help-panel-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+      }
+      
+      .help-panel-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+      
+      .help-panel-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      
+      /* Responsive help panel */
+      @media (max-width: 768px) {
+        #help-panel {
+          width: 100vw;
+          max-width: 100vw;
+        }
+        
+        /* Stack buttons vertically on mobile */
+        .header-buttons {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        
+        .header-buttons a,
+        .header-buttons button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+      
+      /* Help panel animations */
+      .help-panel-slide-in {
+        animation: slideInFromRight 0.3s ease-out;
+      }
+      
+      @keyframes slideInFromRight {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
     </style>
     
   </head>
@@ -137,17 +190,38 @@
             <div class="text-left">
                 <h1 class="text-4xl font-bold text-gray-900 confmap-brand">Conf Map <span class="text-gray-500 font-bold text-blue-500">⊙</span> </h1>
                 <p class="text-gray-600 mt-1">Visualize your YAML and JSON files as an interactive Mind Map</p>
-                <p class="text-xs text-gray-500 mt-1">💡 Shortcuts: <kbd class="px-1 py-0.5 bg-gray-100 rounded text-xs">Alt+T</kbd> TidyUp, <kbd class="px-1 py-0.5 bg-gray-100 rounded text-xs">Alt+E</kbd> Toggle expand, <kbd class="px-1 py-0.5 bg-gray-100 rounded text-xs">↑↓</kbd> Navigate search results, <kbd class="px-1 py-0.5 bg-gray-100 rounded text-xs">Ctrl+C</kbd> Copy lineage</p>
+                
             </div>
           </div>
           <div class="text-right">
             <a href="/" class="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm block mb-2">
               ← Back to HomePage
             </a>
-            <!-- Made with Love -->
-            <p class="text-xs text-gray-500">
-              Developed with ❤️ From <strong>India</strong>
-            </p>
+            <!-- Made with Love and Action Buttons -->
+            <div class="flex flex-col items-end gap-2">
+              <div class="flex items-center gap-3 header-buttons">
+                <!-- GitHub Star Button -->
+                <a href="https://github.com/aksarav/confmap" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-2 px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs rounded-md transition-colors duration-200 group">
+                  <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                  <span class="font-medium">⭐ Star on GitHub</span>
+                </a>
+                
+                <!-- Help Button -->
+                <button id="help-button" class="flex items-center gap-2 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-md transition-colors duration-200" title="Help & Shortcuts">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span class="font-medium">Help</span>
+                </button>
+              </div>
+              
+              <p class="text-xs text-gray-500">
+                Developed with ❤️ From <strong>India</strong>
+              </p>
+            </div>
           </div>
         </div>
       </header>
@@ -243,6 +317,189 @@
           <div id="mindmap-container" class="w-full min-h-[calc(100vh-200px)] bg-white grid-bg"></div>
         </div>
       </main>
+
+      <!-- Help Side Panel -->
+      <div id="help-panel" class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl border-l border-gray-200 transform translate-x-full transition-transform duration-300 ease-in-out z-50 hidden">
+        <div class="flex flex-col h-full">
+          <!-- Help Panel Header -->
+          <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <h2 class="text-lg font-semibold text-gray-800">Help & Shortcuts</h2>
+            </div>
+            <button id="help-close-btn" class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Scrollable Help Content -->
+          <div class="flex-1 overflow-y-auto p-4 space-y-6 help-panel-content">
+            <!-- Getting Started Section -->
+            <div class="space-y-3">
+              <h3 class="text-md font-semibold text-gray-800 flex items-center gap-2">
+                <span class="text-green-500">🚀</span> Getting Started
+              </h3>
+              <div class="space-y-2 text-sm text-gray-600">
+                <p><strong>1.</strong> Click "Choose file" to upload your YAML or JSON configuration file</p>
+                <p><strong>2.</strong> The file will be visualized as an interactive mind map</p>
+                <p><strong>3.</strong> Use the controls and shortcuts to explore your data</p>
+              </div>
+            </div>
+
+            <!-- Keyboard Shortcuts Section -->
+            <div class="space-y-3">
+              <h3 class="text-md font-semibold text-gray-800 flex items-center gap-2">
+                <span class="text-blue-500">⌨️</span> Keyboard Shortcuts
+              </h3>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span class="text-sm text-gray-700">TidyUp Mode</span>
+                  <kbd class="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">Alt + T</kbd>
+                </div>
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span class="text-sm text-gray-700">Toggle Expand/Collapse</span>
+                  <kbd class="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">Alt + E</kbd>
+                </div>
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span class="text-sm text-gray-700">Word Wrap Toggle</span>
+                  <kbd class="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">Alt + W</kbd>
+                </div>
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span class="text-sm text-gray-700">Navigate Search Results</span>
+                  <div class="flex gap-1">
+                    <kbd class="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">↑</kbd>
+                    <kbd class="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">↓</kbd>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span class="text-sm text-gray-700">Copy Node Lineage</span>
+                  <kbd class="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">Ctrl + C</kbd>
+                </div>
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span class="text-sm text-gray-700">Exit TidyUp Mode</span>
+                  <kbd class="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono">Escape</kbd>
+                </div>
+              </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="space-y-3">
+              <h3 class="text-md font-semibold text-gray-800 flex items-center gap-2">
+                <span class="text-purple-500">✨</span> Key Features
+              </h3>
+              <div class="space-y-3">
+                <div class="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                  <h4 class="font-medium text-blue-800 text-sm">🔍 Smart Search</h4>
+                  <p class="text-xs text-blue-700 mt-1">Search through your configuration keys and values. Use arrow keys to navigate multiple results.</p>
+                </div>
+                <div class="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+                  <h4 class="font-medium text-green-800 text-sm">🧹 TidyUp Mode</h4>
+                  <p class="text-xs text-green-700 mt-1">Focus on specific nodes by showing only their lineage. Hover over a node and press Alt+T.</p>
+                </div>
+                <div class="p-3 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+                  <h4 class="font-medium text-purple-800 text-sm">📝 Word Wrapping</h4>
+                  <p class="text-xs text-purple-700 mt-1">Toggle word wrapping for lengthy node text to improve readability.</p>
+                </div>
+                <div class="p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
+                  <h4 class="font-medium text-orange-800 text-sm">📸 Export</h4>
+                  <p class="text-xs text-orange-700 mt-1">Export your mind map as a high-quality PNG image for documentation.</p>
+                </div>
+                <div class="p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-400">
+                  <h4 class="font-medium text-indigo-800 text-sm">🎨 Multiple Layouts</h4>
+                  <p class="text-xs text-indigo-700 mt-1">Choose between Horizontal, Vertical, and Radial layouts for different viewing preferences.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="space-y-3">
+              <h3 class="text-md font-semibold text-gray-800 flex items-center gap-2">
+                <span class="text-yellow-500">💡</span> Pro Tips
+              </h3>
+              <div class="space-y-2 text-sm text-gray-600">
+                <div class="flex items-start gap-2">
+                  <span class="text-yellow-500 text-xs">•</span>
+                  <p>Right-click on any node to access the context menu for quick actions</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-yellow-500 text-xs">•</span>
+                  <p>Use the search feature to quickly locate specific configuration keys</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-yellow-500 text-xs">•</span>
+                  <p>TidyUp mode is perfect for understanding complex nested structures</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-yellow-500 text-xs">•</span>
+                  <p>Copy lineage feature helps document configuration paths</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-yellow-500 text-xs">•</span>
+                  <p>Enable word wrapping when dealing with very long configuration keys</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Supported Formats -->
+            <div class="space-y-3">
+              <h3 class="text-md font-semibold text-gray-800 flex items-center gap-2">
+                <span class="text-teal-500">📄</span> Supported Formats
+              </h3>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="p-2 bg-teal-50 rounded text-center">
+                  <div class="text-teal-600 font-mono text-sm">.yaml</div>
+                </div>
+                <div class="p-2 bg-teal-50 rounded text-center">
+                  <div class="text-teal-600 font-mono text-sm">.yml</div>
+                </div>
+                <div class="p-2 bg-teal-50 rounded text-center">
+                  <div class="text-teal-600 font-mono text-sm">.json</div>
+                </div>
+                <div class="p-2 bg-gray-100 rounded text-center">
+                  <div class="text-gray-500 font-mono text-sm">More soon...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Support & Community -->
+            <div class="space-y-3">
+              <h3 class="text-md font-semibold text-gray-800 flex items-center gap-2">
+                <span class="text-pink-500">💖</span> Support & Community
+              </h3>
+              <div class="p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg border border-pink-200">
+                <div class="text-center space-y-3">
+                  <div class="flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span class="font-semibold text-gray-800">Love ConfMap?</span>
+                  </div>
+                  <p class="text-sm text-gray-600">
+                    If this tool helped you visualize your configurations, please consider giving us a ⭐ on GitHub!
+                  </p>
+                  <a href="https://github.com/aksarav/confmap" target="_blank" rel="noopener noreferrer" 
+                     class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm rounded-md transition-colors duration-200 group">
+                    <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span class="font-medium">⭐ Star on GitHub</span>
+                  </a>
+                  <p class="text-xs text-gray-500 mt-2">
+                    Your support helps us improve and add new features!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help Panel Overlay -->
+      <div id="help-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
 
       <!-- Context Menu -->
       <div id="context-menu" class="context-menu hidden fixed bg-white rounded-lg shadow-xl border border-gray-200 py-2 min-w-[200px] z-50">

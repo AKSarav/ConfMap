@@ -78,6 +78,10 @@ const layoutDropdown = document.getElementById('layout-dropdown') as HTMLSelectE
 const contextMenu = document.getElementById('context-menu') as HTMLDivElement;
 const focusNodeButton = document.getElementById('focus-node-button') as HTMLLIElement;
 const displayDropdown = document.getElementById('display-dropdown') as HTMLSelectElement | null;
+const helpButton = document.getElementById('help-button') as HTMLButtonElement;
+const helpPanel = document.getElementById('help-panel') as HTMLDivElement;
+const helpCloseBtn = document.getElementById('help-close-btn') as HTMLButtonElement;
+const helpOverlay = document.getElementById('help-overlay') as HTMLDivElement;
 
 
 const myChart = echarts.init(mindmapContainer);
@@ -93,6 +97,7 @@ let tidyUpTreeData: EChartsTreeData | null = null;
 let isAllExpanded = false; // Track expand/collapse state
 let currentSearchResults: string[] = []; // Store current search matches
 let currentSearchIndex = 0; // Track which result we're focusing on
+let isWordWrapEnabled = false; // Track word wrapping state
 
 /**
  * Recursively transforms data, applying clustering logic for dense nodes.
@@ -306,7 +311,7 @@ function renderChart(data: EChartsTreeData) {
           position: isRadial ? 'inside' : (currentLayout === 'TB' ? 'top' : 'right'),
           verticalAlign: 'middle',
           align: isRadial ? 'center' : (currentLayout === 'TB' ? 'center' : 'left'),
-          padding: [12, 20], // Increased padding: [top/bottom, left/right]
+          padding: isWordWrapEnabled ? [16, 24] : [12, 20], // Increased padding for word-wrapped text
           borderRadius: 8,
           backgroundColor: 'inherit',
           borderColor: 'transparent',
@@ -315,11 +320,12 @@ function renderChart(data: EChartsTreeData) {
           distance: 8, // Distance from the connection line
           formatter: (params: any) => {
             const { name, isParent, collapsed } = params.data;
+            const wrappedName = wrapText(name);
             if (isParent) {
               const marker = collapsed ? '+' : '-';
-              return `{marker| ${marker} }{name| ${name}}`;
+              return `{marker| ${marker} }{name| ${wrappedName}}`;
             }
-            return `{name|${name}}`;
+            return `{name|${wrappedName}}`;
           },
           rich: {
             marker: {
@@ -337,7 +343,9 @@ function renderChart(data: EChartsTreeData) {
               color: '#333',
               fontSize: 14,
               padding: [0, 8], // Add padding around text
-              lineHeight: 22, // Match marker height for alignment
+              lineHeight: isWordWrapEnabled ? 18 : 22, // Adjust line height for word wrapping
+              width: isWordWrapEnabled ? 200 : 'auto', // Set width for word wrapping
+              overflow: 'break', // Allow text to break
             }
           }
         },
@@ -796,6 +804,76 @@ function copyLineageToClipboard(targetNode: EChartsTreeData) {
 }
 
 /**
+ * Wraps text to multiple lines based on character limit
+ */
+function wrapText(text: string, maxCharsPerLine: number = 25): string {
+  if (!isWordWrapEnabled || text.length <= maxCharsPerLine) {
+    return text;
+  }
+  
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+  
+  for (const word of words) {
+    // If adding this word would exceed the limit
+    if (currentLine.length + word.length + 1 > maxCharsPerLine) {
+      // If current line has content, push it and start new line
+      if (currentLine.length > 0) {
+        lines.push(currentLine.trim());
+        currentLine = word;
+      } else {
+        // Word is longer than max chars, split it
+        if (word.length > maxCharsPerLine) {
+          let remainingWord = word;
+          while (remainingWord.length > maxCharsPerLine) {
+            lines.push(remainingWord.substring(0, maxCharsPerLine));
+            remainingWord = remainingWord.substring(maxCharsPerLine);
+          }
+          currentLine = remainingWord;
+        } else {
+          currentLine = word;
+        }
+      }
+    } else {
+      // Add word to current line
+      if (currentLine.length > 0) {
+        currentLine += ' ' + word;
+      } else {
+        currentLine = word;
+      }
+    }
+  }
+  
+  // Don't forget the last line
+  if (currentLine.length > 0) {
+    lines.push(currentLine.trim());
+  }
+  
+  return lines.join('\n');
+}
+
+/**
+ * Toggles word wrapping mode for lengthy node text
+ */
+function toggleWordWrap() {
+  isWordWrapEnabled = !isWordWrapEnabled;
+  
+  if (!originalTreeData) {
+    showTidyUpNotification('Please upload a configuration file first');
+    return;
+  }
+  
+  // Re-render the chart with the new word wrap setting
+  const dataToRender = isTidyUpMode && tidyUpTreeData ? tidyUpTreeData : originalTreeData;
+  renderChart(dataToRender);
+  
+  // Show notification
+  const status = isWordWrapEnabled ? 'enabled' : 'disabled';
+  showTidyUpNotification(`Word wrapping ${status} for lengthy text`);
+}
+
+/**
  * Shows a temporary notification for TidyUp actions and updates the indicator
  */
 function showTidyUpNotification(message: string) {
@@ -1198,13 +1276,12 @@ function downloadAsPNG() {
                         
                         // Show success feedback
                         if (downloadBtn) {
-                            const originalText = downloadBtn.innerHTML;
                             downloadBtn.innerHTML = '<span class="emoji-icon">✅</span> Saved!';
                             downloadBtn.style.backgroundColor = '#10b981'; // Green color
                             
                             // Reset button after 2 seconds
                             setTimeout(() => {
-                                downloadBtn.innerHTML = originalText;
+                                downloadBtn.innerHTML = '<span class="hidden md:inline">Export PNG ↓</span><span class="md:hidden">📸</span>';
                                 downloadBtn.style.backgroundColor = '';
                             }, 2000);
                         }
@@ -1231,18 +1308,53 @@ function downloadAsPNG() {
 }
 
 /**
+ * Shows the help panel with slide animation
+ */
+function showHelpPanel() {
+  if (helpPanel && helpOverlay) {
+    helpPanel.classList.remove('hidden');
+    helpOverlay.classList.remove('hidden');
+    
+    // Trigger animation after element is visible
+    setTimeout(() => {
+      helpPanel.classList.remove('translate-x-full');
+    }, 10);
+    
+    // Prevent body scroll when help panel is open
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+/**
+ * Hides the help panel with slide animation
+ */
+function hideHelpPanel() {
+  if (helpPanel && helpOverlay) {
+    helpPanel.classList.add('translate-x-full');
+    
+    // Hide elements after animation completes
+    setTimeout(() => {
+      helpPanel.classList.add('hidden');
+      helpOverlay.classList.add('hidden');
+    }, 300);
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+  }
+}
+
+/**
  * Shows error feedback for PNG export
  */
 function showPNGError() {
     const downloadBtn = document.getElementById('download-png-btn');
     if (downloadBtn) {
-        const originalText = downloadBtn.innerHTML;
         downloadBtn.innerHTML = '<span class="emoji-icon">❌</span> Error';
         downloadBtn.style.backgroundColor = '#ef4444'; // Red color
         
         // Reset button after 2 seconds
         setTimeout(() => {
-            downloadBtn.innerHTML = originalText;
+            downloadBtn.innerHTML = '<span class="hidden md:inline">Export PNG ↓</span><span class="md:hidden">📸</span>';
             downloadBtn.style.backgroundColor = '';
         }, 2000);
     }
@@ -1314,6 +1426,27 @@ if (fullscreenBtn) {
 
 // Display options event listener (if present)
 displayDropdown?.addEventListener('change', handleDisplayOptionChange);
+
+// Help panel event listeners
+if (helpButton) {
+    helpButton.addEventListener('click', showHelpPanel);
+}
+
+if (helpCloseBtn) {
+    helpCloseBtn.addEventListener('click', hideHelpPanel);
+}
+
+if (helpOverlay) {
+    helpOverlay.addEventListener('click', hideHelpPanel);
+}
+
+// Close help panel with Escape key
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && helpPanel && !helpPanel.classList.contains('hidden')) {
+        event.preventDefault();
+        hideHelpPanel();
+    }
+});
 
 
 window.addEventListener('click', () => {
@@ -1387,6 +1520,13 @@ document.addEventListener('keydown', (event) => {
         event.preventDefault();
         console.log('Alt+E pressed, toggling expand/collapse all nodes');
         toggleExpandCollapseAll();
+    }
+    
+    // Alt+W to toggle word wrapping for lengthy text
+    if (event.altKey && (event.code === 'KeyW' || event.key.toLowerCase() === 'w')) {
+        event.preventDefault();
+        console.log('Alt+W pressed, toggling word wrapping');
+        toggleWordWrap();
     }
     
     // Ctrl+C to copy lineage of selected node to clipboard
